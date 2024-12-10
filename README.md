@@ -24,3 +24,7 @@ cp .env.example .env
 ```
 python main.py
 ```
+
+## Access
+
+Open [http://localhost:7860](http://localhost:7860) in your browser
