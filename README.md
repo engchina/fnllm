@@ -12,3 +12,15 @@ pip install -e .
 pip install -r requirements.txt
 # pip list --format=freeze > requirements.txt
 ```
+
+## Configuration
+
+```
+cp .env.example .env
+```
+
+## Run
+
+```
+python main.py
+```

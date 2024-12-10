@@ -77,7 +77,10 @@ class OpenAIChatLLMImpl(OpenAIChatLLM):
         OpenAIChatHistoryEntry,
     ]:
         """Invoke the streaming chat output."""
+        print(f"{stream=}")
         if stream:
+            print("invoke _streaming_chat_llm() start...")
             return await self._streaming_chat_llm(prompt, **kwargs)
 
+        print("invoke _text_chat_llm() start...")
         return await self._text_chat_llm(prompt, **kwargs)

@@ -53,10 +53,15 @@ class OpenAIRateLimiter(
             prompt: TInput,
             kwargs: LLMInput[TJsonModel, THistoryEntry, TModelParameters],
     ) -> int:
+        print("rate_limiter.py _estimate_request_tokens() start...")
+        print(f"{prompt=}")
+        print(f"{kwargs=}")
         history = kwargs.get("history", [])
         tools = llm_tools_to_param(kwargs.get("tools", []))
-
-        return sum(
+        print(f"{tools=}")
+        tokens_usage = sum(
             len(self._encoding.encode(json.dumps(entry)))
             for entry in (*history, *tools, prompt)
         )
+        print(f"{tokens_usage=}")
+        return tokens_usage

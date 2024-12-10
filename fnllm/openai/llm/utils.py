@@ -26,6 +26,8 @@ def function_call_to_param(
         func: OpenAIFunctionCallModel | None,
 ) -> OpenAIFunctionCallParam | None:
     """Parses FunctionCall base model to the equivalent typed dict."""
+    print("function_call_to_param() start...")
+    print(f"{func=}")
     if not func:
         return None
 
@@ -81,6 +83,8 @@ def chat_completion_message_to_param(
         message: OpenAIChatCompletionMessageModel,
 ) -> OpenAIChatCompletionAssistantMessageParam:
     """Parses ChatCompletionMessage base model to the equivalent typed dict."""
+    print("utils.py chat_completion_message_to_param() start...")
+    print(f"{message=}")
     param = OpenAIChatCompletionAssistantMessageParam(
         role=message.role, content=message.content
     )

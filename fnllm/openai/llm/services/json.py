@@ -24,6 +24,9 @@ def create_json_handler(
         max_retries: int,
 ) -> JsonHandler[OpenAIChatOutput, OpenAIChatHistoryEntry]:
     """Create a JSON handler for OpenAI."""
+    print("create_json_handler() start...")
+    print(f"{strategy=}")
+    print(f"{max_retries=}")
     marshaler = OpenAIJsonMarshaler()
     match strategy:
         case JsonStrategy.LOOSE:

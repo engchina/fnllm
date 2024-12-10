@@ -25,6 +25,7 @@ class LLMEventsLogger(LLMEvents):
             arguments: dict[str, Any] | None = None,
     ) -> None:
         """An unhandled error that happens during the LLM call (called by the LLM base)."""
+        print("logger.py on_try() start...")
         self._logger.error(
             "unexpected error occurred for arguments '%s':\n\n%s\n\n%s",
             arguments,
@@ -34,6 +35,7 @@ class LLMEventsLogger(LLMEvents):
 
     async def on_usage(self, usage: LLMUsageMetrics) -> None:
         """Called when there is any LLM usage."""
+        print("logger.py on_usage() start...")
         self._logger.info(
             "LLM usage with %d total tokens (input=%d, output=%d)",
             usage.total_tokens,
@@ -43,6 +45,7 @@ class LLMEventsLogger(LLMEvents):
 
     async def on_limit_acquired(self, manifest: Manifest) -> None:
         """Called when limit is acquired for a request (does not include post limiting)."""
+        print("logger.py on_limit_acquired() start...")
         self._logger.info(
             "limit acquired for request, request_tokens=%d, post_request_tokens=%d",
             manifest.request_tokens,
@@ -51,6 +54,7 @@ class LLMEventsLogger(LLMEvents):
 
     async def on_limit_released(self, manifest: Manifest) -> None:
         """Called when limit is released for a request (does not include post limiting)."""
+        print("logger.py on_limit_released() start...")
         self._logger.info(
             "limit released for request, request_tokens=%d, post_request_tokens=%d",
             manifest.request_tokens,
@@ -59,6 +63,7 @@ class LLMEventsLogger(LLMEvents):
 
     async def on_post_limit(self, manifest: Manifest) -> None:
         """Called when post request limiting is triggered (called by the rate limiting LLM)."""
+        print("logger.py on_post_limit() start...")
         self._logger.info(
             "post request limiting triggered, acquired extra %d tokens",
             manifest.post_request_tokens,
@@ -69,6 +74,7 @@ class LLMEventsLogger(LLMEvents):
             metrics: LLMMetrics,
     ) -> None:
         """Called when a request goes through (called by the retrying LLM)."""
+        print("logger.py on_success() start...")
         self._logger.info(
             "request succeed with %d retries in %.2fs and used %d tokens",
             metrics.retry.num_retries,
@@ -78,6 +84,7 @@ class LLMEventsLogger(LLMEvents):
 
     async def on_cache_hit(self, cache_key: str, name: str | None) -> None:
         """Called when there is a cache hit."""
+        print("logger.py on_cache_hit() start...")
         self._logger.info(
             "cache hit for key=%s and name=%s",
             cache_key,
@@ -86,6 +93,7 @@ class LLMEventsLogger(LLMEvents):
 
     async def on_cache_miss(self, cache_key: str, name: str | None) -> None:
         """Called when there is a cache miss."""
+        print("logger.py on_cache_miss() start...")
         self._logger.info(
             "cache miss for key=%s and name=%s",
             cache_key,
@@ -94,12 +102,14 @@ class LLMEventsLogger(LLMEvents):
 
     async def on_try(self, attempt_number: int) -> None:
         """Called every time a new try to call the LLM happens."""
+        print("logger.py on_try() start...")
         self._logger.debug("calling llm, attempt #%d", attempt_number)
 
     async def on_retryable_error(
             self, error: BaseException, attempt_number: int
     ) -> None:
         """Called when retryable errors happen."""
+        print("logger.py on_retryable_error() start...")
         self._logger.warning(
             "retryable error happened on attempt #%d: %s", attempt_number, str(error)
         )

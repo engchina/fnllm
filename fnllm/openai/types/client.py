@@ -42,7 +42,10 @@ OpenAIStreamingChatLLM: TypeAlias = LLM[
 ]
 
 OpenAIEmbeddingsLLM: TypeAlias = LLM[
-    OpenAIEmbeddingsInput, OpenAIEmbeddingsOutput, None, OpenAIEmbeddingsParameters
+    OpenAIEmbeddingsInput,
+    OpenAIEmbeddingsOutput,
+    None,
+    OpenAIEmbeddingsParameters
 ]
 """Alias for the fully typed OpenAIEmbeddingsLLM instance."""
 

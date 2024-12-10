@@ -20,7 +20,11 @@ class OpenAIHistoryExtractor(
             output: OpenAIChatOutput,
     ) -> list[OpenAIChatHistoryEntry]:
         """Call the LLM."""
+        print("history_extractor.py extract_history() start...")
+        print(f"{history=}")
+        print(f"{output=}")
         result = [*history] if history else []
+        print(f"{result=}")
 
         if output.raw_input is not None:
             result.append(output.raw_input)

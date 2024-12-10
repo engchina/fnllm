@@ -43,7 +43,10 @@ class RateLimiter(
             self,
             result: LLMOutput[TOutput, TJsonModel, THistoryEntry],
     ) -> None:
+        print("rate_limiter.py _handle_post_request_limiting() start...")
+        print(f"{result=}")
         diff = result.metrics.tokens_diff
+        print(f"{diff=}")
 
         if diff > 0:
             manifest = Manifest(post_request_tokens=diff)
@@ -60,11 +63,18 @@ class RateLimiter(
         """Execute the LLM with the configured rate limits."""
 
         async def invoke(prompt: TInput, **args: Unpack[LLMInput[Any, Any, Any]]):
+            print("rate_limiter.py decorate() invoke() start...")
+            print(f"{prompt=}")
+            print(f"{args=}")
             estimated_input_tokens = self._estimate_request_tokens(prompt, args)
+            print(f"{estimated_input_tokens=}")
 
             manifest = Manifest(request_tokens=estimated_input_tokens)
+            print(f"{manifest=}")
             try:
+                print(f"{self._limiter=}")
                 async with self._limiter.use(manifest):
+                    print(f"{self._events=}")
                     await self._events.on_limit_acquired(manifest)
                     result = await delegate(prompt, **args)
             finally:

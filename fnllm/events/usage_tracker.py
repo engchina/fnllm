@@ -63,12 +63,14 @@ class LLMUsageTracker(LLMEvents):
 
     async def on_usage(self, usage: LLMUsageMetrics) -> None:
         """Called when there is any LLM usage."""
+        print("usage_tracker on_usage() start...")
         self._total_requests += 1
         self._total_usage.input_tokens += usage.input_tokens
         self._total_usage.output_tokens += usage.output_tokens
 
     async def on_limit_acquired(self, manifest: Manifest) -> None:
         """Called when limit is acquired for a request (does not include post limiting)."""
+        print("usage_tracker.py on_limit_acquired() start...")
         self._current_concurrency += 1
         self._max_concurrency = max(self._max_concurrency, self._current_concurrency)
 
@@ -81,6 +83,7 @@ class LLMUsageTracker(LLMEvents):
 
     async def on_post_limit(self, manifest: Manifest) -> None:
         """Called when post request limiting is triggered (called by the rate limiting LLM)."""
+        print("usage_tracker.py on_post_limit() start...")
         await self._tpm_sliding_window.insert(manifest.post_request_tokens)
 
     @classmethod

@@ -54,4 +54,6 @@ class Limiter(ABC):
 
     def use(self, manifest: Manifest) -> LimitContext:
         """Limit for a given amount (default = 1)."""
+        print("fnllm/limiting/base.py use() start...")
+        print(f"{manifest=}")
         return LimitContext(self, manifest)

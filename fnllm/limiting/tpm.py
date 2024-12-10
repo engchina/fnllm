@@ -16,15 +16,20 @@ class TPMLimiter(Limiter):
 
     async def acquire(self, manifest: Manifest) -> None:
         """Acquire limiter permission."""
+        print("fnllm/limiting/tpm.py acquire() start...")
         total_tokens = manifest.request_tokens + manifest.post_request_tokens
+        print(f"{total_tokens=}")
 
         if total_tokens > 0:
+            print(f"total_tokens > 0")
             await self._limiter.acquire(total_tokens)
 
     async def release(self, manifest: Manifest) -> None:
         """Do nothing."""
+        print("fnllm/limiting/tpm.py release() start...")
 
     @classmethod
     def from_tpm(cls, tokens_per_minute: int) -> "TPMLimiter":
         """Create a new RpmLimiter."""
+        print("fnllm/limiting/tpm.py from_tpm() start...")
         return cls(AsyncLimiter(tokens_per_minute))

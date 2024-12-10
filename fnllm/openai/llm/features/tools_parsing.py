@@ -19,7 +19,7 @@ from fnllm.openai.types.chat.io import (
 )
 from fnllm.openai.types.chat.parameters import OpenAIChatParameters
 from fnllm.tools import LLMTool
-from fnllm.tools.errors import ToolInvalidArgumentsError, ToolNotFoundError
+from fnllm.tools.errors import OpenAIToolInvalidArgumentsError, OpenAIToolNotFoundError
 from fnllm.types.generics import TJsonModel
 from fnllm.types.io import LLMInput, LLMOutput
 from fnllm.types.protocol import LLM
@@ -56,6 +56,7 @@ class OpenAIParseToolsLLM(
             parameters: LLMInput[TJsonModel, OpenAIChatHistoryEntry, OpenAIChatParameters],
             tools: Sequence[type[LLMTool]],
     ) -> LLMInput[TJsonModel, OpenAIChatHistoryEntry, OpenAIChatParameters]:
+        print("tools_parsing.py _add_tools_to_parameters() start...")
         new_parameters = parameters.copy()
 
         new_parameters["model_parameters"] = new_parameters.get("model_parameters", {})
@@ -70,10 +71,11 @@ class OpenAIParseToolsLLM(
             json_model: type[LLMTool],
             raw_output: OpenAIChatCompletionMessageModel,
     ) -> LLMTool:
+        print("tools_parsing.py _parse_arguments() start...")
         try:
             return json_model.model_validate_json(tool_call.function.arguments)
         except pydantic.ValidationError as err:
-            raise ToolInvalidArgumentsError(
+            raise OpenAIToolInvalidArgumentsError(
                 raw_output,
                 tool_call=tool_call,
                 expected_tool=json_model,
@@ -86,6 +88,7 @@ class OpenAIParseToolsLLM(
             *,
             tools: Sequence[type[LLMTool]],
     ) -> list[LLMTool]:
+        print("tools_parsing.py _parse_tool_calls() start...")
         result = []
         tool_calls = raw_output.tool_calls or []
 
@@ -93,7 +96,7 @@ class OpenAIParseToolsLLM(
             tool = LLMTool.find_tool(tools, call.function.name)
 
             if not tool:
-                raise ToolNotFoundError(raw_output, tool_call=call)
+                raise OpenAIToolNotFoundError(raw_output, tool_call=call)
 
             parsed_json = self._parse_arguments(
                 call, json_model=tool, raw_output=raw_output
@@ -114,6 +117,7 @@ class OpenAIParseToolsLLM(
             ],
     ) -> LLMOutput[OpenAIChatOutput, TJsonModel, OpenAIChatHistoryEntry]:
         """Call the LLM."""
+        print("tools_parsing.py __call__() start...")
         tools = kwargs.get("tools", [])
 
         if not tools:

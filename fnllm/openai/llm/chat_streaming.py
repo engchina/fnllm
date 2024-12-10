@@ -86,6 +86,7 @@ class OpenAIStreamingChatLLMImpl(
     def _build_completion_parameters(
             self, local_parameters: OpenAIChatParameters | None
     ) -> OpenAIChatParameters:
+        print("chat_streaming.py _build_completion_parameters() start...")
         params: OpenAIChatParameters = {
             "model": self._model,
             **self._global_model_parameters,
@@ -101,6 +102,7 @@ class OpenAIStreamingChatLLMImpl(
                 LLMInput[TJsonModel, OpenAIChatHistoryEntry, OpenAIChatParameters]
             ],
     ) -> OpenAIStreamingChatOutput:
+        print("chat_streaming.py _execute_llm() start...")
         history = kwargs.get("history", [])
         local_model_parameters = kwargs.get("model_parameters")
         messages, prompt_message = build_chat_messages(prompt, history)
@@ -146,14 +148,17 @@ class StreamingChatIterator:
 
     def on_usage(self, cb: Callable[[LLMUsageMetrics], None]) -> None:
         """Handle usage events."""
+        print("chat_streaming.py StreamingChatIterator.on_usage() start...")
         self._on_usage = cb
 
     async def __stream__(self) -> AsyncIterator[str | None]:
         """Read chunks from the stream."""
+        print("chat_streaming.py StreamingChatIterator.__stream__() start...")
         usage = LLMUsageMetrics()
         try:
             async for chunk in self._chunks:
                 # Note: this is only emitted _just_ prior to the stream completing.
+                print(f"{chunk=}")
                 if chunk.usage:
                     usage = LLMUsageMetrics(
                         input_tokens=chunk.usage.prompt_tokens,
@@ -181,8 +186,10 @@ class StreamingChatIterator:
     @property
     def iterator(self) -> AsyncIterator[str | None]:
         """Return the content."""
+        print("chat_streaming.py StreamingChatIterator.iterator() start...")
         return self._iterator
 
     async def close(self) -> None:
         """Close the stream."""
+        print("chat_streaming.py StreamingChatIterator.close() start...")
         await self._chunks.close()

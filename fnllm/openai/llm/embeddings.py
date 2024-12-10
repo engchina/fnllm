@@ -121,6 +121,7 @@ class OpenAIEmbeddingsLLMImpl(
     async def _execute_llm(
             self, prompt: OpenAIEmbeddingsInput, **kwargs: Unpack[LLMInput]
     ) -> OpenAIEmbeddingsOutput:
+        print("embeddings.py _execute_llm() start...")
         name = kwargs.get("name")
         local_model_parameters = kwargs.get("model_parameters")
         bypass_cache = kwargs.get("bypass_cache", False)

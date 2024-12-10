@@ -106,6 +106,7 @@ class OpenAITextChatLLMImpl(
     def _build_completion_parameters(
             self, local_parameters: OpenAIChatParameters | None
     ) -> OpenAIChatParameters:
+        print("chat_text.py _build_completion_parameters() start...")
         params: OpenAIChatParameters = {
             "model": self._model,
             **self._global_model_parameters,
@@ -142,6 +143,7 @@ class OpenAITextChatLLMImpl(
                 LLMInput[TJsonModel, OpenAIChatHistoryEntry, OpenAIChatParameters]
             ],
     ) -> OpenAIChatOutput:
+        print("chat_text.py _execute_llm() start...")
         name = kwargs.get("name")
         history = kwargs.get("history", [])
         bypass_cache = kwargs.get("bypass_cache", False)

@@ -69,6 +69,12 @@ def _create_openai_text_chat_llm(
         cache_interactor: CacheInteractor | None,
         events: LLMEvents | None,
 ) -> OpenAITextChatLLM:
+    print("create_openai_text_chat_llm() start...")
+    print(f"{config=}")
+    print(f"{limiter=}")
+    print(f"{cache=}")
+    print(f"{cache_interactor=}")
+    print(f"{events=}")
     operation = "chat"
     result = OpenAITextChatLLMImpl(
         client,
@@ -95,6 +101,10 @@ def _create_openai_streaming_chat_llm(
         events: LLMEvents | None,
 ) -> OpenAIStreamingChatLLM:
     """Create an OpenAI streaming chat LLM."""
+    print("create_openai_streaming_chat_llm() start...")
+    print(f"{config=}")
+    print(f"{limiter=}")
+    print(f"{events=}")
     return OpenAIStreamingChatLLMImpl(
         client,
         model=config.model,

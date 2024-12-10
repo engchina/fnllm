@@ -23,4 +23,7 @@ class OpenAIUsageExtractor(
 
     def extract_usage(self, output: TOutputWithUsageMetrics) -> LLMUsageMetrics:
         """Extract the LLM Usage from an OpenAI response."""
+        print("extract_usage() start...")
+        print(f"{output.usage=}")
+        print(f"{LLMUsageMetrics()=}")
         return output.usage or LLMUsageMetrics()

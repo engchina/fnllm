@@ -20,6 +20,7 @@ class CompositeLimiter(Limiter):
         """Acquire the specified amount of tokens from all limiters."""
         # this needs to be sequential, the order of the limiters must be respected
         # to avoid deadlocks
+        print("fnllm/limiting/composite.py acquire() start...")
         for limiter in self._acquire_order:
             await limiter.acquire(manifest)
 
@@ -27,5 +28,6 @@ class CompositeLimiter(Limiter):
         """Release all tokens from all limiters."""
         # release in the opposite order we acquired
         # the last limiter acquired should be the first one released
+        print("fnllm/limiting/composite.py release() start...")
         for limiter in self._release_order:
             await limiter.release(manifest)

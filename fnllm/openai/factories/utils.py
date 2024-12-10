@@ -20,11 +20,13 @@ from fnllm.services.retryer import Retryer
 
 
 def _get_encoding(encoding_name: str) -> tiktoken.Encoding:
+    print("fnllm/openai/factories/utils.py _get_encoding() start...")
     return tiktoken.get_encoding(encoding_name)
 
 
 def create_limiter(config: OpenAIConfig) -> Limiter:
     """Create an LLM limiter based on the incoming configuration."""
+    print("fnllm/openai/factories/utils.py create_limiter() start...")
     limiters = []
 
     if config.max_concurrency:
@@ -39,6 +41,7 @@ def create_limiter(config: OpenAIConfig) -> Limiter:
 
     if config.tokens_per_minute:
         limiters.append(TPMLimiter.from_tpm(config.tokens_per_minute))
+    print(f"{limiters=}")
 
     return CompositeLimiter(limiters)
 
@@ -50,6 +53,10 @@ def create_rate_limiter(
         events: LLMEvents | None,
 ) -> RateLimiter[Any, Any, Any, Any]:
     """Wraps the LLM to be rate limited."""
+    print("fnllm/openai/factories/utils.py create_rate_limiter() start...")
+    print(f"{limiter=}")
+    print(f"{config=}")
+    print(f"{events=}")
     return OpenAIRateLimiter(
         encoder=_get_encoding(config.encoding),
         limiter=limiter,
@@ -64,6 +71,10 @@ def create_retryer(
         events: LLMEvents | None,
 ) -> Retryer[Any, Any, Any, Any]:
     """Wraps the LLM with retry logic."""
+    print("fnllm/openai/factories/utils.py create_retryer() start...")
+    print(f"{config=}")
+    print(f"{operation=}")
+    print(f"{events=}")
     return OpenAIRetryer(
         tag=operation,
         max_retries=config.max_retries,

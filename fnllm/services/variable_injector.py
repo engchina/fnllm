@@ -17,6 +17,9 @@ class VariableInjector:
             self, prompt: TInput, variables: PromptVariables | None
     ) -> TInput:
         """Call the LLM."""
+        print("variable_injector.py inject_variables() start...")
+        print(f"{prompt=}")
+        print(f"{variables=}")
         parsed_prompt = prompt
 
         if isinstance(parsed_prompt, str) and variables:

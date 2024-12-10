@@ -108,6 +108,9 @@ class BaseLLM(
             **kwargs: Unpack[LLMInput[TJsonModel, THistoryEntry, TModelParameters]],
     ) -> LLMOutput[TOutput, TJsonModel, THistoryEntry]:
         """Invoke the LLM."""
+        print("fnllm/base/base.py __call__() start...")
+        print(f"{prompt=}")
+        print(f"{kwargs=}")
         try:
             return await self._invoke(prompt, **kwargs)
         except BaseException as e:
@@ -124,7 +127,12 @@ class BaseLLM(
             **kwargs: Unpack[LLMInput[TJsonModel, THistoryEntry, TModelParameters]],
     ) -> LLMOutput[TOutput, TJsonModel, THistoryEntry]:
         """Run the LLM invocation, returning an LLMOutput."""
+        print("fnllm/base/base.py _invoke() start...")
+        print(f"{prompt=}")
+        print(f"{kwargs=}")
         prompt, kwargs = self._rewrite_input(prompt, kwargs)
+        print(f"{prompt=}")
+        print(f"{kwargs=}")
         return await self._decorated_target(prompt, **kwargs)
 
     def _rewrite_input(
@@ -133,6 +141,10 @@ class BaseLLM(
             kwargs: LLMInput[TJsonModel, THistoryEntry, TModelParameters],
     ) -> tuple[TInput, LLMInput[TJsonModel, THistoryEntry, TModelParameters]]:
         """Rewrite the input prompt and arguments.."""
+        print("base.py _rewrite_input() start...")
+        print(f"{prompt=}")
+        print(f"{kwargs=}")
+        print(f"{self._variable_injector=}")
         if self._variable_injector:
             prompt = self._variable_injector.inject_variables(
                 prompt, kwargs.get("variables")
@@ -148,9 +160,15 @@ class BaseLLM(
 
         Leave signature alone as prompt, **kwargs.
         """
+        print("fnllm/base/base.py _decorator_target() start...")
+        print(f"{prompt=}")
+        print(f"{kwargs=}")
+        print(f"{self._events=}")
         await self._events.on_execute_llm()
         output = await self._execute_llm(prompt, **kwargs)
+        print(f"{output=}")
         result: LLMOutput[TOutput, TJsonModel, THistoryEntry] = LLMOutput(output=output)
+        print(f"{result=}")
 
         await self._inject_usage(result)
         self._inject_history(result, kwargs.get("history"))
@@ -160,7 +178,10 @@ class BaseLLM(
     async def _inject_usage(
             self, result: LLMOutput[TOutput, TJsonModel, THistoryEntry]
     ):
+        print("base.py _inject_usage() start...")
+        print(f"{result=}")
         usage = LLMUsageMetrics()
+        print(f"{self._usage_extractor=}")
         if self._usage_extractor:
             usage = self._usage_extractor.extract_usage(result.output)
             await self._events.on_usage(usage)
