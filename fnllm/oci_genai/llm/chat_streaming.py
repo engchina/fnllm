@@ -9,6 +9,7 @@ from typing import TypeAlias, Callable
 
 import oci
 from openai import AsyncStream
+# from langfuse.openai import AsyncStream
 from openai.types.chat import ChatCompletionChunk
 from typing_extensions import Unpack
 
@@ -98,7 +99,7 @@ class OCIGenAIStreamingChatLLMImpl(
                 LLMInput[TJsonModel, OCIGenAIChatHistoryEntry, OCIGenAIChatParameters]
             ],
     ) -> OCIGenAIStreamingChatOutput:
-        print("chat_streaming.py _execute_llm() start...")
+        print("fnllm/oci_genai/llm/chat_streaming.py OCIGenAIStreamingChatLLMImpl._execute_llm() start...")
         # print(f"{kwargs=}")
         history = kwargs.get("history", [])
         local_model_parameters = kwargs.get("model_parameters")
@@ -145,6 +146,7 @@ class OCIGenAIStreamingChatLLMImpl(
 
         iterator.on_usage(handle_usage)
 
+        print(f"fnllm/oci_genai/llm/chat_streaming.py OCIGenAIStreamingChatLLMImpl._execute_llm() return {result=}...")
         return result
 
 

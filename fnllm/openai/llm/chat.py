@@ -31,11 +31,21 @@ class OpenAIChatLLMImpl(OpenAIChatLLM):
             streaming_chat_llm: OpenAIStreamingChatLLM,
     ):
         """Create a new OpenAI Chat Facade."""
+        print()
+        print("fnllm/openai/llm/chat.py OpenAIChatLLMImpl.__init__() start...")
         self._text_chat_llm = text_chat_llm
         self._streaming_chat_llm = streaming_chat_llm
+        print("fnllm/openai/llm/chat.py OpenAIChatLLMImpl.__init__() end...")
+        print()
 
     def child(self, name: str) -> "OpenAIChatLLMImpl":
         """Create a child LLM (with child cache)."""
+        print()
+        print("fnllm/openai/llm/chat.py OpenAIChatLLMImpl.child() start...")
+        print("fnllm/openai/llm/chat.py OpenAIChatLLMImpl.child() {name=}")
+        print("fnllm/openai/llm/chat.py OpenAIChatLLMImpl.child() return OpenAIChatLLMImpl()...")
+        print()
+
         return OpenAIChatLLMImpl(
             text_chat_llm=self._text_chat_llm.child(name),
             streaming_chat_llm=self._streaming_chat_llm.child(name),
@@ -77,10 +87,15 @@ class OpenAIChatLLMImpl(OpenAIChatLLM):
         OpenAIChatHistoryEntry,
     ]:
         """Invoke the streaming chat output."""
-        print(f"{stream=}")
+        print()
+        print("fnllm/openai/llm/chat.py OpenAIChatLLMImpl.__call__() start...")
+        print(f"fnllm/openai/llm/chat.py OpenAIChatLLMImpl.__call__() {stream=}")
         if stream:
-            print("invoke _streaming_chat_llm() start...")
+            print(f"fnllm/openai/llm/chat.py OpenAIChatLLMImpl.__call__() return self._streaming_chat_llm(prompt, **kwargs)")
+            print()
             return await self._streaming_chat_llm(prompt, **kwargs)
 
-        print("invoke _text_chat_llm() start...")
+        print(
+            f"fnllm/openai/llm/chat.py OpenAIChatLLMImpl.__call__() return self._text_chat_llm(prompt, **kwargs)")
+        print()
         return await self._text_chat_llm(prompt, **kwargs)

@@ -4,7 +4,8 @@
 
 from typing import cast
 
-from openai import AsyncAzureOpenAI, AsyncOpenAI
+# from openai import AsyncAzureOpenAI, AsyncOpenAI
+from langfuse.openai import AsyncAzureOpenAI, AsyncOpenAI
 
 from fnllm.openai.config import AzureOpenAIConfig, OpenAIConfig, PublicOpenAIConfig
 from fnllm.openai.types.client import OpenAIClient
@@ -12,6 +13,8 @@ from fnllm.openai.types.client import OpenAIClient
 
 def create_openai_client(config: OpenAIConfig) -> OpenAIClient:
     """Create a new OpenAI client instance."""
+    print()
+    print("fnllm/openai/factories/client.py create_openai_client() start...")
     if config.azure:
         from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
@@ -38,6 +41,8 @@ def create_openai_client(config: OpenAIConfig) -> OpenAIClient:
         )
 
     config = cast(PublicOpenAIConfig, config)
+    print("fnllm/openai/factories/client.py create_openai_client() return AsyncOpenAI()...")
+    print()
 
     return AsyncOpenAI(
         api_key=config.api_key,

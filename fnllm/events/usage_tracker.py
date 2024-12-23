@@ -18,12 +18,16 @@ class LLMUsageTracker(LLMEvents):
             tpm_sliding_window: SlidingWindow,
     ) -> None:
         """Create a new LLMUsageTracker."""
+        print()
+        print("fnllm/events/usage_tracker.py LLMUsageTracker.__init__() start...")
         self._rpm_sliding_window = rpm_sliding_window
         self._tpm_sliding_window = tpm_sliding_window
         self._current_concurrency = 0
         self._max_concurrency = 0
         self._total_usage = LLMUsageMetrics()
         self._total_requests = 0
+        print("fnllm/events/usage_tracker.py LLMUsageTracker.__init__() end...")
+        print()
 
     @property
     def total_usage(self) -> LLMUsageMetrics:
@@ -63,30 +67,48 @@ class LLMUsageTracker(LLMEvents):
 
     async def on_usage(self, usage: LLMUsageMetrics) -> None:
         """Called when there is any LLM usage."""
-        print("usage_tracker on_usage() start...")
+        print()
+        print("fnllm/events/usage_tracker.py LLMUsageTracker.on_usage() start...")
         self._total_requests += 1
         self._total_usage.input_tokens += usage.input_tokens
         self._total_usage.output_tokens += usage.output_tokens
+        print("fnllm/events/usage_tracker.py LLMUsageTracker.on_usage() end...")
+        print()
 
     async def on_limit_acquired(self, manifest: Manifest) -> None:
         """Called when limit is acquired for a request (does not include post limiting)."""
-        print("usage_tracker.py on_limit_acquired() start...")
+        print()
+        print("fnllm/events/usage_tracker.py LLMUsageTracker.on_limit_acquired() start...")
         self._current_concurrency += 1
         self._max_concurrency = max(self._max_concurrency, self._current_concurrency)
 
         await self._rpm_sliding_window.insert(1)
         await self._tpm_sliding_window.insert(manifest.request_tokens)
+        print("fnllm/events/usage_tracker.py LLMUsageTracker.on_limit_acquired() end...")
+        print()
 
     async def on_limit_released(self, manifest: Manifest) -> None:
         """Called when limit is released for a request (does not include post limiting)."""
+        print()
+        print("fnllm/events/usage_tracker.py LLMUsageTracker.on_limit_released() start...")
         self._current_concurrency = max(0, self._current_concurrency - 1)
+        print("fnllm/events/usage_tracker.py LLMUsageTracker.on_limit_released() end...")
+        print()
 
     async def on_post_limit(self, manifest: Manifest) -> None:
         """Called when post request limiting is triggered (called by the rate limiting LLM)."""
-        print("usage_tracker.py on_post_limit() start...")
+        print()
+        print("fnllm/events/usage_tracker.py LLMUsageTracker.on_post_limit() start...")
         await self._tpm_sliding_window.insert(manifest.post_request_tokens)
+        print("fnllm/events/usage_tracker.py LLMUsageTracker.on_post_limit() end...")
+        print()
 
     @classmethod
     def create(cls) -> "LLMUsageTracker":
         """Create a new LLMUsageTracker with proper sliding windows."""
+        print()
+        print("fnllm/events/usage_tracker.py LLMUsageTracker.create() start...")
+        print(
+            "fnllm/events/usage_tracker.py LLMUsageTracker.create() return `cls(SlidingWindow(60), SlidingWindow(60))`...")
+
         return cls(SlidingWindow(60), SlidingWindow(60))

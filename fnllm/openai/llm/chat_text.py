@@ -70,6 +70,9 @@ class OpenAITextChatLLMImpl(
                           | None = None,
     ):
         """Create a new OpenAIChatLLM."""
+        print()
+        print("fnllm/openai/llm/chat_text.py OpenAITextChatLLMImpl.__init__() start...")
+        print("fnllm/openai/llm/chat_text.py OpenAITextChatLLMImpl.__init__() invoke super().__init__() start...")
         super().__init__(
             events=events,
             usage_extractor=usage_extractor,
@@ -79,11 +82,15 @@ class OpenAITextChatLLMImpl(
             rate_limiter=rate_limiter,
             json_handler=json_handler,
         )
+        print("fnllm/openai/llm/chat_text.py OpenAITextChatLLMImpl.__init__() invoke super().__init__() end...")
 
         self._client = client
         self._model = model
         self._global_model_parameters = model_parameters or {}
         self._cache = cache
+        print("fnllm/openai/llm/chat_text.py OpenAITextChatLLMImpl.__init__() start...")
+        print()
+
 
     def child(self, name: str) -> Any:
         """Create a child LLM."""

@@ -70,6 +70,10 @@ def llm_tools_to_param(
         tools: Sequence[type[LLMTool]],
 ) -> Iterable[OpenAIChatCompletionToolParam]:
     """Parses a list of classes that implements LLMTool to the equivalent typed dicts."""
+    print()
+    print("fnllm/openai/llm/utils.py llm_tools_to_param() start...")
+    print("fnllm/openai/llm/utils.py llm_tools_to_param() return OpenAIChatCompletionToolParam()...")
+    print()
     return [
         OpenAIChatCompletionToolParam(
             function=llm_tool_to_param(tool),
@@ -83,7 +87,7 @@ def chat_completion_message_to_param(
         message: OpenAIChatCompletionMessageModel,
 ) -> OpenAIChatCompletionAssistantMessageParam:
     """Parses ChatCompletionMessage base model to the equivalent typed dict."""
-    print("utils.py chat_completion_message_to_param() start...")
+    print("fnllm/openai/llm/utils.py chat_completion_message_to_param() start...")
     print(f"{message=}")
     param = OpenAIChatCompletionAssistantMessageParam(
         role=message.role, content=message.content
@@ -107,6 +111,8 @@ def build_chat_messages(
         history: Sequence[OpenAIChatHistoryEntry],
 ) -> tuple[list[OpenAIChatHistoryEntry], OpenAIChatHistoryEntry]:
     """Builds a chat history list from the prompt and existing history, along with the prompt message."""
+    print()
+    print("fnllm/openai/llm/utils.py build_chat_messages() start...")
     if isinstance(prompt, str):
         prompt = OpenAIChatCompletionUserMessageParam(
             content=prompt,
@@ -115,4 +121,7 @@ def build_chat_messages(
     messages = [*history]
     if prompt is not None:
         messages.append(prompt)
+
+    print("fnllm/openai/llm/utils.py build_chat_messages() return messages, cast(OpenAIChatHistoryEntry, prompt)...")
+    print()
     return messages, cast(OpenAIChatHistoryEntry, prompt)

@@ -6,6 +6,7 @@ azure-common==1.1.28
 azure-core==1.32.0
 azure-identity==1.19.0
 azure-storage-blob==12.24.0
+backoff==2.2.1
 certifi==2024.8.30
 cffi==1.17.1
 charset-normalizer==3.4.0
@@ -29,6 +30,7 @@ isodate==0.7.2
 Jinja2==3.1.4
 jiter==0.8.0
 json_repair==0.30.3
+langfuse==2.57.1
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 mdurl==0.1.2
@@ -77,3 +79,4 @@ urllib3==2.2.3
 uvicorn==0.32.1
 websockets==14.1
 wheel==0.44.0
+wrapt==1.17.0

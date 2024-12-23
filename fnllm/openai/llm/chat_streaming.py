@@ -67,6 +67,7 @@ class OpenAIStreamingChatLLMImpl(
             events: LLMEvents | None = None,
     ):
         """Create a new OpenAIChatLLM."""
+        print("fnllm/openai/llm/chat_streaming.py OpenAIStreamingChatLLMImpl.__init__() start...")
         super().__init__(
             events=events,
             variable_injector=variable_injector,
@@ -86,13 +87,13 @@ class OpenAIStreamingChatLLMImpl(
     def _build_completion_parameters(
             self, local_parameters: OpenAIChatParameters | None
     ) -> OpenAIChatParameters:
-        print("chat_streaming.py _build_completion_parameters() start...")
+        print("fnllm/openai/llm/chat_streaming.py OpenAIStreamingChatLLMImpl._build_completion_parameters() start...")
         params: OpenAIChatParameters = {
             "model": self._model,
             **self._global_model_parameters,
             **(local_parameters or {}),
         }
-
+        print(f"fnllm/openai/llm/chat_streaming.py OpenAIStreamingChatLLMImpl._build_completion_parameters() return {params=}...")
         return params
 
     async def _execute_llm(
@@ -102,7 +103,7 @@ class OpenAIStreamingChatLLMImpl(
                 LLMInput[TJsonModel, OpenAIChatHistoryEntry, OpenAIChatParameters]
             ],
     ) -> OpenAIStreamingChatOutput:
-        print("chat_streaming.py _execute_llm() start...")
+        print("fnllm/openai/llm/chat_streaming.py OpenAIStreamingChatLLMImpl._execute_llm() start...")
         history = kwargs.get("history", [])
         local_model_parameters = kwargs.get("model_parameters")
         messages, prompt_message = build_chat_messages(prompt, history)
@@ -148,17 +149,18 @@ class StreamingChatIterator:
 
     def on_usage(self, cb: Callable[[LLMUsageMetrics], None]) -> None:
         """Handle usage events."""
-        print("chat_streaming.py StreamingChatIterator.on_usage() start...")
+        print("fnllm/openai/llm/chat_streaming.py StreamingChatIterator.on_usage() start...")
         self._on_usage = cb
+        print("fnllm/openai/llm/chat_streaming.py StreamingChatIterator.on_usage() end...")
 
     async def __stream__(self) -> AsyncIterator[str | None]:
         """Read chunks from the stream."""
-        print("chat_streaming.py StreamingChatIterator.__stream__() start...")
+        print("fnllm/openai/llm/chat_streaming.py StreamingChatIterator.__stream__() start...")
         usage = LLMUsageMetrics()
         try:
+            print("fnllm/openai/llm/chat_streaming.py StreamingChatIterator.__stream__() run `async for chunk in self._chunks` start...")
             async for chunk in self._chunks:
                 # Note: this is only emitted _just_ prior to the stream completing.
-                print(f"{chunk=}")
                 if chunk.usage:
                     usage = LLMUsageMetrics(
                         input_tokens=chunk.usage.prompt_tokens,
@@ -170,6 +172,7 @@ class StreamingChatIterator:
 
                 if chunk.choices and len(chunk.choices) > 0:
                     yield chunk.choices[0].delta.content
+            print("fnllm/openai/llm/chat_streaming.py StreamingChatIterator.__stream__() run `async for chunk in self._chunks` end...")
         except BaseException as e:
             stack_trace = traceback.format_exc()
             await self._events.on_error(e, stack_trace, {"streaming": True})
@@ -186,7 +189,10 @@ class StreamingChatIterator:
     @property
     def iterator(self) -> AsyncIterator[str | None]:
         """Return the content."""
-        print("chat_streaming.py StreamingChatIterator.iterator() start...")
+        print()
+        print("fnllm/openai/llm/chat_streaming.py StreamingChatIterator.iterator() start...")
+        print(f"fnllm/openai/llm/chat_streaming.py StreamingChatIterator.iterator() return {self._iterator=}...")
+        print()
         return self._iterator
 
     async def close(self) -> None:

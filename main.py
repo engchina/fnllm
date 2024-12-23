@@ -11,53 +11,113 @@ from fnllm.openai import create_openai_client, create_openai_chat_llm, PublicOpe
 # read local .env file
 load_dotenv(find_dotenv())
 
+custom_css = """
+@font-face {
+  font-family: 'Noto Sans JP';
+  src: url('fonts/NotoSansJP-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Sans SC';
+  src: url('fonts/NotoSansSC-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Sans TC';
+  src: url('fonts/NotoSansSC-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Sans HK';
+  src: url('fonts/NotoSansHK-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('fonts/Roboto-Regular.ttf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --global-font-family: "Noto Sans JP", "Noto Sans SC", "Noto Sans TC", "Noto Sans HK", "Roboto", Arial, sans-serif;
+}
+
+code, pre {
+  font-family: monospace !important;
+}
+
+html, body, *:not(code):not(pre) {
+  font-family: var(--global-font-family) !important;
+}
+"""
 
 async def openai_chat(message, history):
-    print(f"{message=}")
+    print("main.py openai_chat() start...")
+    print(f"main.py openai_chat() {message=}")
     if len(history) > 2:
         history = history[-2:]
-        print(f"{history=}")
-    print("create configuration start...")
+        print(f"main.py openai_chat() {history=}")
+    print("main.py openai_chat() invoke PublicOpenAIConfig() start...")
     configuration = PublicOpenAIConfig(
         api_key=os.environ['OPENAI_API_KEY'],
         base_url=os.environ['OPENAI_BASE_URL'],
         model=os.environ['OPENAI_MODEL'],
         max_concurrency=4,
-        tokens_per_minute=4000,
-        requests_per_minute=20,
+        tokens_per_minute=0,
+        requests_per_minute=1,
         requests_burst_mode=False,
     )
-    print(f"{configuration=}")
-    print("create configuration end...")
+    print(f"main.py openai_chat() {configuration=}")
+    print("main.py openai_chat() invoke PublicOpenAIConfig() end...")
 
-    print("create client start...")
+    print("main.py openai_chat() invoke create_openai_client() start...")
     client = create_openai_client(configuration)
-    print(f"{client=}")
-    print("create client end...")
+    print("main.py openai_chat() invoke create_openai_client() end...")
 
-    print("create openai_chat_llm start...")
+    print("main.py openai_chat() invoke create_openai_chat_llm() start...")
     openai_chat_llm = create_openai_chat_llm(
         configuration,
         client=client,
     )
-    print(f"{openai_chat_llm=}")
-    print("create openai_chat_llm end...")
+    print(f"main.py openai_chat() {openai_chat_llm=}")
+    print("main.py openai_chat() invoke create_openai_chat_llm() end...")
 
-    print("create response start...")
+    # print("main.py openai_chat() invoke openai_chat_llm() start...")
+    # response = await openai_chat_llm(
+    #     prompt=message,
+    #     stream=False,
+    #     name="chat",
+    #     history=history,
+    # )
+    # print("main.py openai_chat() invoke openai_chat_llm() end...")
+    # print(f"{response=}")
+    # yield response.history[-1]
+
+    print("main.py openai_chat() invoke openai_chat_llm() start...")
     response = await openai_chat_llm(
         prompt=message,
         stream=True,
         name="chat",
         history=history,
     )
-    # print(f"{response=}")
-    # print("create response end...")
+    print("main.py openai_chat() invoke openai_chat_llm() end...")
 
     answer = ""
     async for chunk in response.output.content:
         # print(f"{chunk=}")
-        answer += chunk
-        yield answer
+        if chunk:
+            answer += chunk
+            yield answer
+
 
 async def oci_genai_embedding(message, history):
     print(f"{message=}")
@@ -69,7 +129,7 @@ async def oci_genai_embedding(message, history):
             "model_id": os.environ['OCI_GENAI_EMBEDDING_MODEL_NAME'],
         },
         max_concurrency=4,
-        tokens_per_minute=4000,
+        tokens_per_minute=8000,
         requests_per_minute=20,
         requests_burst_mode=False,
     )
@@ -114,7 +174,7 @@ async def oci_genai_chat(message, history):
             "model_id": os.environ['OCI_GENAI_CHAT_MODEL_NAME'],
         },
         max_concurrency=4,
-        tokens_per_minute=4000,
+        tokens_per_minute=0,
         requests_per_minute=20,
         requests_burst_mode=False,
     )
@@ -167,7 +227,7 @@ async def oci_genai_chat_stream(message, history):
             "model_id": os.environ['OCI_GENAI_CHAT_MODEL_NAME'],
         },
         max_concurrency=4,
-        tokens_per_minute=4000,
+        tokens_per_minute=0,
         requests_per_minute=20,
         requests_burst_mode=False,
     )
@@ -203,6 +263,7 @@ async def oci_genai_chat_stream(message, history):
         answer += chunk
         yield answer
 
+
 def vote(data: gr.LikeData):
     print(f"{data.value=}")
     print(f"Chatbot response: {data.value[-1]}")
@@ -212,7 +273,7 @@ def vote(data: gr.LikeData):
         return "Bad response. "
 
 
-with gr.Blocks() as app:
+with gr.Blocks(css=custom_css) as app:
     vote_output = gr.Textbox(label="vote output", visible=False)
     with gr.Row():
         with gr.Column():
@@ -235,7 +296,7 @@ with gr.Blocks() as app:
                 type="messages",
                 chatbot=openai_chatbot
             )
-        with gr.Column():
+        with gr.Column(visible=False):
             oci_genai_chatbot = gr.Chatbot(
                 label="OCI GenAI",
                 type="messages",

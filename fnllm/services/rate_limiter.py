@@ -28,8 +28,13 @@ class RateLimiter(
             events: LLMEvents | None = None,
     ):
         """Create a new BaseRateLimitLLM."""
+        print()
+        print("fnllm/services/rate_limiter.py RateLimiter.__init__() start...")
         self._limiter = limiter
         self._events = events or LLMEvents()
+        print("fnllm/services/rate_limiter.py RateLimiter.__init__() end...")
+        print()
+
 
     @abstractmethod
     def _estimate_request_tokens(
@@ -43,10 +48,10 @@ class RateLimiter(
             self,
             result: LLMOutput[TOutput, TJsonModel, THistoryEntry],
     ) -> None:
-        print("rate_limiter.py _handle_post_request_limiting() start...")
-        print(f"{result=}")
+        print("fnllm/services/rate_limiter.py RateLimiter._handle_post_request_limiting() start...")
+        print(f"RateLimiter._handle_post_request_limiting() {result=}")
         diff = result.metrics.tokens_diff
-        print(f"{diff=}")
+        print(f"RateLimiter._handle_post_request_limiting() {diff=}")
 
         if diff > 0:
             manifest = Manifest(post_request_tokens=diff)
@@ -61,28 +66,41 @@ class RateLimiter(
             ],
     ) -> Callable[..., Awaitable[LLMOutput[TOutput, TJsonModel, THistoryEntry]]]:
         """Execute the LLM with the configured rate limits."""
+        print("fnllm/services/rate_limiter.py RateLimiter.decorate() start...")
 
         async def invoke(prompt: TInput, **args: Unpack[LLMInput[Any, Any, Any]]):
-            print("rate_limiter.py decorate() invoke() start...")
-            print(f"{prompt=}")
-            print(f"{args=}")
+            print("fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() start...")
+            print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() {prompt=}")
+            print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() {args=}")
             estimated_input_tokens = self._estimate_request_tokens(prompt, args)
-            print(f"{estimated_input_tokens=}")
+            print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() {estimated_input_tokens=}")
 
             manifest = Manifest(request_tokens=estimated_input_tokens)
-            print(f"{manifest=}")
+            print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() {manifest=}")
             try:
-                print(f"{self._limiter=}")
+                print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() {self._limiter=}")
+                print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() run `async with self._limiter.use(manifest)` start...")
                 async with self._limiter.use(manifest):
-                    print(f"{self._events=}")
+                    print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() {self._events=}")
+                    print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_acquired() start...")
                     await self._events.on_limit_acquired(manifest)
+                    print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_acquired() end...")
+                    print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke delegate() start...")
                     result = await delegate(prompt, **args)
+                    print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke delegate() end...")
+                print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() run `async with self._limiter.use(manifest)` end...")
             finally:
+                print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_released() start...")
                 await self._events.on_limit_released(manifest)
+                print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_released() end...")
 
             result.metrics.estimated_input_tokens = estimated_input_tokens
+            print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._handle_post_request_limiting() start...")
             await self._handle_post_request_limiting(result)
+            print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._handle_post_request_limiting() start...")
 
+            print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() return {result=}...")
             return result
 
+        print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() return {invoke=}...")
         return invoke

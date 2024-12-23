@@ -20,15 +20,18 @@ class OpenAIHistoryExtractor(
             output: OpenAIChatOutput,
     ) -> list[OpenAIChatHistoryEntry]:
         """Call the LLM."""
-        print("history_extractor.py extract_history() start...")
-        print(f"{history=}")
-        print(f"{output=}")
+        print()
+        print("fnllm/openai/llm/services/history_extractor.py OpenAIHistoryExtractor.extract_history() start...")
+        print(f"fnllm/openai/llm/services/history_extractor.py OpenAIHistoryExtractor.extract_history() {history=}")
+        print(f"fnllm/openai/llm/services/history_extractor.py OpenAIHistoryExtractor.extract_history() {output=}")
         result = [*history] if history else []
-        print(f"{result=}")
+        print(f"fnllm/openai/llm/services/history_extractor.py OpenAIHistoryExtractor.extract_history() {result=}")
 
         if output.raw_input is not None:
             result.append(output.raw_input)
 
         result.append(chat_completion_message_to_param(output.raw_output))
 
+        print(f"fnllm/openai/llm/services/history_extractor.py OpenAIHistoryExtractor.extract_history() return {result=}...")
+        print()
         return result

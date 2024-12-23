@@ -42,26 +42,41 @@ class OpenAIRateLimiter(
             events: LLMEvents | None = None,
     ):
         """Create a new BaseRateLimitLLM."""
+        print()
+        print("fnllm/openai/llm/services/rate_limiter.py OpenAIRateLimiter.__init__() start...")
+        print(
+            "fnllm/openai/llm/services/rate_limiter.py OpenAIRateLimiter.__init__() invoke super().__init__() start...")
         super().__init__(
             limiter,
             events=events,
         )
+        print("fnllm/openai/llm/services/rate_limiter.py OpenAIRateLimiter.__init__() invoke super().__init__() end...")
+
         self._encoding = encoder
+        print("fnllm/openai/llm/services/rate_limiter.py OpenAIRateLimiter.__init__() end...")
+        print()
 
     def _estimate_request_tokens(
             self,
             prompt: TInput,
             kwargs: LLMInput[TJsonModel, THistoryEntry, TModelParameters],
     ) -> int:
-        print("rate_limiter.py _estimate_request_tokens() start...")
-        print(f"{prompt=}")
-        print(f"{kwargs=}")
+        print("fnllm/openai/llm/services/rate_limiter.py OpenAIRateLimiter._estimate_request_tokens() start...")
+        print(f"fnllm/openai/llm/services/rate_limiter.py OpenAIRateLimiter._estimate_request_tokens() {prompt=}")
+        print(f"fnllm/openai/llm/services/rate_limiter.py OpenAIRateLimiter._estimate_request_tokens() {kwargs=}")
         history = kwargs.get("history", [])
+
+        print(
+            f"fnllm/openai/llm/services/rate_limiter.py OpenAIRateLimiter._estimate_request_tokens() invoke llm_tools_to_param() start...")
         tools = llm_tools_to_param(kwargs.get("tools", []))
-        print(f"{tools=}")
+        print(
+            f"fnllm/openai/llm/services/rate_limiter.py OpenAIRateLimiter._estimate_request_tokens() invoke llm_tools_to_param() end...")
+
+        print(f"fnllm/openai/llm/services/rate_limiter.py OpenAIRateLimiter._estimate_request_tokens() {tools=}")
         tokens_usage = sum(
             len(self._encoding.encode(json.dumps(entry)))
             for entry in (*history, *tools, prompt)
         )
-        print(f"{tokens_usage=}")
+        print(
+            f"fnllm/openai/llm/services/rate_limiter.py OpenAIRateLimiter._estimate_request_tokens() return {tokens_usage=}")
         return tokens_usage

@@ -24,14 +24,23 @@ def create_json_handler(
         max_retries: int,
 ) -> JsonHandler[OpenAIChatOutput, OpenAIChatHistoryEntry]:
     """Create a JSON handler for OpenAI."""
-    print("create_json_handler() start...")
-    print(f"{strategy=}")
-    print(f"{max_retries=}")
+    print()
+    print("fnllm/openai/llm/services/json.py create_json_handler() start...")
+    print(f"fnllm/openai/llm/services/json.py create_json_handler() {strategy=}")
+    print(f"fnllm/openai/llm/services/json.py create_json_handler() {max_retries=}")
     marshaler = OpenAIJsonMarshaler()
+    print(f"fnllm/openai/llm/services/json.py create_json_handler() {marshaler=}")
+
     match strategy:
         case JsonStrategy.LOOSE:
+            print(
+                "fnllm/openai/llm/services/json.py create_json_handler() return JsonHandler(None, LooseModeJsonReceiver(marshaler, max_retries))...")
+            print()
             return JsonHandler(None, LooseModeJsonReceiver(marshaler, max_retries))
         case JsonStrategy.VALID:
+            print(
+                "fnllm/openai/llm/services/json.py create_json_handler() return JsonHandler(OpenAIJsonRequester(), JsonReceiver(marshaler, max_retries))...")
+            print()
             return JsonHandler(
                 OpenAIJsonRequester(), JsonReceiver(marshaler, max_retries)
             )
@@ -48,13 +57,23 @@ class OpenAIJsonMarshaler(JsonMarshaler[OpenAIChatOutput, OpenAIChatHistoryEntry
             output: LLMOutput[OpenAIChatOutput, TJsonModel, OpenAIChatHistoryEntry],
     ) -> LLMOutput[OpenAIChatOutput, TJsonModel, OpenAIChatHistoryEntry]:
         """Inject the JSON string into the output."""
+        print()
+        print("fnllm/openai/llm/services/json.py inject_json_string() start...")
         output.output.content = json_string
+        print(f"fnllm/openai/llm/services/json.py inject_json_string() return {output=}...")
+        print()
+
         return output
 
     def extract_json_string(
             self, output: LLMOutput[OpenAIChatOutput, TJsonModel, OpenAIChatHistoryEntry]
     ) -> str | None:
         """Extract the JSON string from the output."""
+        print()
+        print("fnllm/openai/llm/services/json.py extract_json_string() start...")
+        print(f"fnllm/openai/llm/services/json.py extract_json_string() return {output.output.content=}...")
+        print()
+
         return output.output.content
 
 
@@ -77,14 +96,22 @@ class OpenAIJsonRequester(
         LLMInput[TJsonModel, OpenAIChatHistoryEntry, OpenAIChatParameters],
     ]:
         """Rewrite the input prompt and arguments.."""
+        print()
+        print("fnllm/openai/llm/services/json.py OpenAIJsonRequester.rewrite_args() start...")
         kwargs["model_parameters"] = self._enable_oai_json_mode(
             kwargs.get("model_parameters", {})
         )
+        print(f"fnllm/openai/llm/services/json.py OpenAIJsonRequester.rewrite_args() return {prompt=}, {kwargs=}...")
+        print()
+
         return prompt, kwargs
 
     def _enable_oai_json_mode(
             self, parameters: OpenAIChatParameters
     ) -> OpenAIChatParameters:
+        print("fnllm/openai/llm/services/json.py OpenAIJsonRequester._enable_oai_json_mode() start...")
         result: OpenAIChatParameters = parameters.copy()
         result["response_format"] = {"type": "json_object"}
+        print("fnllm/openai/llm/services/json.py OpenAIJsonRequester._enable_oai_json_mode() return {result=}...")
+
         return result

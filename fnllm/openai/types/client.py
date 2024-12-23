@@ -4,7 +4,8 @@
 
 from typing import Literal, Protocol, TypeAlias, overload, runtime_checkable
 
-from openai import AsyncAzureOpenAI, AsyncOpenAI
+# from openai import AsyncAzureOpenAI, AsyncOpenAI
+from langfuse.openai import AsyncAzureOpenAI, AsyncOpenAI
 from typing_extensions import Unpack
 
 from fnllm.openai.types.chat.io import (

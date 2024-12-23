@@ -52,6 +52,7 @@ class BaseLLM(
             json_handler: JsonHandler[TOutput, THistoryEntry] | None = None,
     ) -> None:
         """Base constructor for the BaseLLM."""
+        print("fnllm/base/base.py BaseLLM.__init__() start...")
         self._events = events or LLMEvents()
         self._cache = cache
         self._usage_extractor = usage_extractor
@@ -62,14 +63,25 @@ class BaseLLM(
         self._json_handler = json_handler
 
         decorated = self._decorator_target
+        print(f"fnllm/base/base.py BaseLLM.__init__() {decorated=}")
+        print(f"fnllm/base/base.py BaseLLM.__init__() {self.decorators=}")
+        print(f"fnllm/base/base.py BaseLLM.__init__() run `for decorator in self.decorators` start...")
         for decorator in self.decorators:
+            print(f"fnllm/base/base.py BaseLLM.__init__() invoke decorator.decorate({decorator=}) start")
             decorated = decorator.decorate(decorated)
+            print(f"fnllm/base/base.py BaseLLM.__init__() {decorated=}")
+            print(f"fnllm/base/base.py BaseLLM.__init__() invoke decorator.decorate({decorator=}) end")
+        print(f"fnllm/base/base.py BaseLLM.__init__() run `for decorator in self.decorators` end...")
         self._decorated_target = decorated
+        print(f"fnllm/base/base.py BaseLLM.__init__() {self._decorated_target=}")
+        print("fnllm/base/base.py BaseLLM.__init__() end...")
+
 
     def child(
             self, name: str
     ) -> "BaseLLM[TInput, TOutput, THistoryEntry, TModelParameters]":
         """Create a child LLM."""
+        print("fnllm/base/base.py BaseLLM.child() start...")
         if self._cache is None:
             return self
         return self.__class__(
@@ -86,11 +98,14 @@ class BaseLLM(
     @property
     def events(self) -> LLMEvents:
         """Registered LLM events handler."""
+        print("fnllm/base/base.py BaseLLM.events() start...")
         return self._events
 
     @property
     def decorators(self) -> list[LLMDecorator[TOutput, THistoryEntry]]:
         """Get the list of LLM decorators."""
+        print()
+        print("fnllm/base/base.py BaseLLM.decorators() start...")
         decorators: list[LLMDecorator] = []
         if self._json_handler and self._json_handler.requester:
             decorators.append(self._json_handler.requester)
@@ -100,6 +115,9 @@ class BaseLLM(
             decorators.append(self._retryer)
         if self._json_handler and self._json_handler.receiver:
             decorators.append(self._json_handler.receiver)
+        print(f"fnllm/base/base.py BaseLLM.decorators() return {decorators=}")
+        print()
+
         return decorators
 
     async def __call__(
@@ -108,10 +126,12 @@ class BaseLLM(
             **kwargs: Unpack[LLMInput[TJsonModel, THistoryEntry, TModelParameters]],
     ) -> LLMOutput[TOutput, TJsonModel, THistoryEntry]:
         """Invoke the LLM."""
-        print("fnllm/base/base.py __call__() start...")
-        print(f"{prompt=}")
-        print(f"{kwargs=}")
+        print()
+        print("fnllm/base/base.py BaseLLM.__call__() start...")
+        print(f"fnllm/base/base.py BaseLLM.__call__() {prompt=}")
+        print(f"fnllm/base/base.py BaseLLM.__call__() {kwargs=}")
         try:
+            print(f"fnllm/base/base.py BaseLLM.__call__() return self._invoke(prompt, **kwargs)")
             return await self._invoke(prompt, **kwargs)
         except BaseException as e:
             stack_trace = traceback.format_exc()
@@ -127,12 +147,15 @@ class BaseLLM(
             **kwargs: Unpack[LLMInput[TJsonModel, THistoryEntry, TModelParameters]],
     ) -> LLMOutput[TOutput, TJsonModel, THistoryEntry]:
         """Run the LLM invocation, returning an LLMOutput."""
-        print("fnllm/base/base.py _invoke() start...")
-        print(f"{prompt=}")
-        print(f"{kwargs=}")
+        print("fnllm/base/base.py BaseLLM._invoke() start...")
+        print(f"fnllm/base/base.py BaseLLM._invoke() {prompt=}")
+        print(f"fnllm/base/base.py BaseLLM._invoke() {kwargs=}")
+        print(f"fnllm/base/base.py BaseLLM._invoke() invoke self._rewrite_input(prompt, kwargs) start...")
         prompt, kwargs = self._rewrite_input(prompt, kwargs)
-        print(f"{prompt=}")
-        print(f"{kwargs=}")
+        print(f"fnllm/base/base.py BaseLLM._invoke() {prompt=}")
+        print(f"fnllm/base/base.py BaseLLM._invoke() {kwargs=}")
+        print(f"fnllm/base/base.py BaseLLM._invoke() {self._decorated_target=}")
+        print("fnllm/base/base.py BaseLLM._invoke() return self._decorated_target(prompt, **kwargs)...")
         return await self._decorated_target(prompt, **kwargs)
 
     def _rewrite_input(
@@ -141,14 +164,15 @@ class BaseLLM(
             kwargs: LLMInput[TJsonModel, THistoryEntry, TModelParameters],
     ) -> tuple[TInput, LLMInput[TJsonModel, THistoryEntry, TModelParameters]]:
         """Rewrite the input prompt and arguments.."""
-        print("base.py _rewrite_input() start...")
-        print(f"{prompt=}")
-        print(f"{kwargs=}")
-        print(f"{self._variable_injector=}")
+        print("fnllm/base/base.py BaseLLM._rewrite_input() start...")
+        print(f"fnllm/base/base.py BaseLLM._rewrite_input() {prompt=}")
+        print(f"fnllm/base/base.py BaseLLM._rewrite_input() {kwargs=}")
+        print(f"fnllm/base/base.py BaseLLM._rewrite_input() {self._variable_injector=}")
         if self._variable_injector:
             prompt = self._variable_injector.inject_variables(
                 prompt, kwargs.get("variables")
             )
+        print(f"fnllm/base/base.py BaseLLM._rewrite_input() return {prompt=}, {kwargs=}...")
         return prompt, kwargs
 
     async def _decorator_target(
@@ -160,42 +184,55 @@ class BaseLLM(
 
         Leave signature alone as prompt, **kwargs.
         """
-        print("fnllm/base/base.py _decorator_target() start...")
-        print(f"{prompt=}")
-        print(f"{kwargs=}")
-        print(f"{self._events=}")
+        print("fnllm/base/base.py BaseLLM._decorator_target() start...")
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() {prompt=}")
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() {kwargs=}")
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() {self._events=}")
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._events.on_execute_llm() start...")
         await self._events.on_execute_llm()
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._events.on_execute_llm() end...")
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._execute_llm(prompt, **kwargs) start...")
         output = await self._execute_llm(prompt, **kwargs)
-        print(f"{output=}")
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() {output=}")
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._execute_llm(prompt, **kwargs) end...")
         result: LLMOutput[TOutput, TJsonModel, THistoryEntry] = LLMOutput(output=output)
-        print(f"{result=}")
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() {result=}")
 
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._inject_usage(result) start...")
         await self._inject_usage(result)
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._inject_usage(result) end...")
+
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._inject_history(result, kwargs.get('history')) start...")
         self._inject_history(result, kwargs.get("history"))
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._inject_history(result, kwargs.get('history')) end...")
+        print(f"fnllm/base/base.py BaseLLM._decorator_target() return {result=}...")
 
         return result
 
     async def _inject_usage(
             self, result: LLMOutput[TOutput, TJsonModel, THistoryEntry]
     ):
-        print("base.py _inject_usage() start...")
-        print(f"{result=}")
+        print("fnllm/base/base.py BaseLLM._inject_usage() start...")
+        print(f"fnllm/base/base.py BaseLLM._inject_usage() {result=}")
         usage = LLMUsageMetrics()
-        print(f"{self._usage_extractor=}")
+        print(f"fnllm/base/base.py BaseLLM._inject_usage() {self._usage_extractor=}")
         if self._usage_extractor:
             usage = self._usage_extractor.extract_usage(result.output)
             await self._events.on_usage(usage)
         result.metrics.usage = usage
+        print("fnllm/base/base.py BaseLLM._inject_usage() end...")
 
     def _inject_history(
             self,
             result: LLMOutput[TOutput, TJsonModel, THistoryEntry],
             history: Sequence[THistoryEntry] | None,
     ) -> None:
+        print("fnllm/base/base.py BaseLLM._inject_history() start...")
         if self._history_extractor:
             result.history = self._history_extractor.extract_history(
                 history, result.output
             )
+        print("fnllm/base/base.py BaseLLM._inject_history() end...")
 
     @abstractmethod
     async def _execute_llm(

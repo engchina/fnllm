@@ -45,7 +45,11 @@ class OpenAIParseToolsLLM(
             ],
     ):
         """Create a new OpenAIParseToolsLLM."""
+        print()
+        print("fnllm/openai/llm/features/tools_parsing.py OpenAIParseToolsLLM.__init__() start...")
         self._delegate = delegate
+        print("fnllm/openai/llm/features/tools_parsing.py OpenAIParseToolsLLM.__init__() end...")
+        print()
 
     def child(self, name: str) -> "OpenAIParseToolsLLM":
         """Create a child LLM (with child cache)."""
@@ -71,8 +75,10 @@ class OpenAIParseToolsLLM(
             json_model: type[LLMTool],
             raw_output: OpenAIChatCompletionMessageModel,
     ) -> LLMTool:
-        print("tools_parsing.py _parse_arguments() start...")
+        print("fnllm/openai/llm/features/tools_parsing.py _parse_arguments.__init__() start...")
         try:
+            print("fnllm/openai/llm/features/tools_parsing.py _parse_arguments.__init__() end...")
+            print("fnllm/openai/llm/features/tools_parsing.py _parse_arguments.__init__() return json_model.model_validate_json()...")
             return json_model.model_validate_json(tool_call.function.arguments)
         except pydantic.ValidationError as err:
             raise OpenAIToolInvalidArgumentsError(

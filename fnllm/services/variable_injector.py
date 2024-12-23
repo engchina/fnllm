@@ -17,12 +17,13 @@ class VariableInjector:
             self, prompt: TInput, variables: PromptVariables | None
     ) -> TInput:
         """Call the LLM."""
-        print("variable_injector.py inject_variables() start...")
-        print(f"{prompt=}")
-        print(f"{variables=}")
+        print("fnllm/services/variable_injector.py VariableInjector.inject_variables() start...")
+        print(f"fnllm/services/variable_injector.py {prompt=}")
+        print(f"fnllm/services/variable_injector.py {variables=}")
         parsed_prompt = prompt
 
         if isinstance(parsed_prompt, str) and variables:
             parsed_prompt = Template(parsed_prompt).substitute(**variables)
 
+        print("fnllm/services/variable_injector.py VariableInjector.inject_variables() return cast(TInput, parsed_prompt)...")
         return cast(TInput, parsed_prompt)

@@ -20,12 +20,16 @@ from fnllm.services.retryer import Retryer
 
 
 def _get_encoding(encoding_name: str) -> tiktoken.Encoding:
+    print()
     print("fnllm/openai/factories/utils.py _get_encoding() start...")
+    print(f"fnllm/openai/factories/utils.py _get_encoding() return tiktoken.get_encoding({encoding_name=})...")
+    print()
     return tiktoken.get_encoding(encoding_name)
 
 
 def create_limiter(config: OpenAIConfig) -> Limiter:
     """Create an LLM limiter based on the incoming configuration."""
+    print()
     print("fnllm/openai/factories/utils.py create_limiter() start...")
     limiters = []
 
@@ -41,7 +45,8 @@ def create_limiter(config: OpenAIConfig) -> Limiter:
 
     if config.tokens_per_minute:
         limiters.append(TPMLimiter.from_tpm(config.tokens_per_minute))
-    print(f"{limiters=}")
+    print(f"fnllm/openai/factories/utils.py create_limiter() {limiters=}")
+    print(f"fnllm/openai/factories/utils.py create_limiter() return CompositeLimiter({limiters=})...")
 
     return CompositeLimiter(limiters)
 
@@ -53,15 +58,27 @@ def create_rate_limiter(
         events: LLMEvents | None,
 ) -> RateLimiter[Any, Any, Any, Any]:
     """Wraps the LLM to be rate limited."""
+    print()
     print("fnllm/openai/factories/utils.py create_rate_limiter() start...")
-    print(f"{limiter=}")
-    print(f"{config=}")
-    print(f"{events=}")
-    return OpenAIRateLimiter(
-        encoder=_get_encoding(config.encoding),
+    print(f"fnllm/openai/factories/utils.py create_rate_limiter() {limiter=}")
+    print(f"fnllm/openai/factories/utils.py create_rate_limiter() {config=}")
+    print(f"fnllm/openai/factories/utils.py create_rate_limiter() {events=}")
+    print(f"fnllm/openai/factories/utils.py create_rate_limiter() invoke _get_encoding() start...")
+    encoder = _get_encoding(config.encoding)
+    print(f"fnllm/openai/factories/utils.py create_rate_limiter() invoke _get_encoding() end...")
+
+    print(f"fnllm/openai/factories/utils.py create_rate_limiter() invoke OpenAIRateLimiter() start...")
+    openai_rate_limiter = OpenAIRateLimiter(
+        encoder=encoder,
         limiter=limiter,
         events=events,
     )
+    print(f"fnllm/openai/factories/utils.py create_rate_limiter() invoke OpenAIRateLimiter() end...")
+
+    print(f"fnllm/openai/factories/utils.py create_rate_limiter() return {openai_rate_limiter=}...")
+    print()
+
+    return openai_rate_limiter
 
 
 def create_retryer(
@@ -71,14 +88,22 @@ def create_retryer(
         events: LLMEvents | None,
 ) -> Retryer[Any, Any, Any, Any]:
     """Wraps the LLM with retry logic."""
+    print()
     print("fnllm/openai/factories/utils.py create_retryer() start...")
-    print(f"{config=}")
-    print(f"{operation=}")
-    print(f"{events=}")
-    return OpenAIRetryer(
+    print(f"fnllm/openai/factories/utils.py create_retryer() {config=}")
+    print(f"fnllm/openai/factories/utils.py create_retryer() {operation=}")
+    print(f"fnllm/openai/factories/utils.py create_retryer() {events=}")
+
+    print(f"fnllm/openai/factories/utils.py create_retryer() invoke OpenAIRetryer() start...")
+    openai_retryer = OpenAIRetryer(
         tag=operation,
         max_retries=config.max_retries,
         max_retry_wait=config.max_retry_wait,
         sleep_on_rate_limit_recommendation=config.sleep_on_rate_limit_recommendation,
         events=events,
     )
+    print(f"fnllm/openai/factories/utils.py create_retryer() invoke OpenAIRetryer() end...")
+
+    print(f"fnllm/openai/factories/utils.py create_retryer() return {openai_retryer=}...")
+    print()
+    return openai_retryer

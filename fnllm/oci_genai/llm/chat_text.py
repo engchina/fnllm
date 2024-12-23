@@ -170,7 +170,7 @@ class OCIGenAITextChatLLMImpl(
                 for msg in history
             ]
 
-        chat_response = self._client.chat(chat_detail)
+        # chat_response = self._client.chat(chat_detail)
 
         completion = await self._call_completion_or_cache(
             name,

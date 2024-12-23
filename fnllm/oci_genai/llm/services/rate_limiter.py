@@ -42,6 +42,7 @@ class OCIGenAIRateLimiter(
             events: LLMEvents | None = None,
     ):
         """Create a new BaseRateLimitLLM."""
+        print("fnllm/oci_genai/llm/services/rate_limiter.py __init__() start...")
         super().__init__(
             limiter,
             events=events,
@@ -53,6 +54,7 @@ class OCIGenAIRateLimiter(
             prompt: TInput,
             kwargs: LLMInput[TJsonModel, THistoryEntry, TModelParameters],
     ) -> int:
+        print("fnllm/oci_genai/llm/services/rate_limiter.py _estimate_request_tokens() start...")
         history = kwargs.get("history", [])
         tools = llm_tools_to_param(kwargs.get("tools", []))
 
