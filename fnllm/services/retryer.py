@@ -2,10 +2,11 @@
 
 """Rate limiting LLM implementation."""
 
+from __future__ import annotations
+
 import asyncio
 from abc import abstractmethod
-from collections.abc import Awaitable, Callable, Sequence
-from typing import Any, Generic
+from typing import TYPE_CHECKING, Any, Generic
 
 from tenacity import (
     AsyncRetrying,
@@ -24,9 +25,13 @@ from fnllm.types.generics import (
     TModelParameters,
     TOutput,
 )
-from fnllm.types.io import LLMInput, LLMOutput
 from fnllm.types.metrics import LLMRetryMetrics
 from .decorator import LLMDecorator
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable, Sequence
+
+    from fnllm.types.io import LLMInput, LLMOutput
 
 
 class Retryer(
@@ -55,7 +60,6 @@ class Retryer(
         print("fnllm/services/retryer.py Retryer.__init__() end...")
         print()
 
-
     @abstractmethod
     async def _on_retryable_error(self, error: BaseException) -> None:
         """Called as soon as retryable error happen."""
@@ -81,7 +85,8 @@ class Retryer(
                 call_start = asyncio.get_event_loop().time()
 
                 try:
-                    print("fnllm/services/retryer.py Retryer.decorate().invoke().attempt() invoke self._events.on_try() start...")
+                    print(
+                        "fnllm/services/retryer.py Retryer.decorate().invoke().attempt() invoke self._events.on_try() start...")
                     await self._events.on_try(attempt_number)
                     print("fnllm/services/retryer.py Retryer.decorate().invoke().attempt() return delegate()...")
                     print()
@@ -101,7 +106,8 @@ class Retryer(
                 print("fnllm/services/retryer.py Retryer.decorate().invoke().execute_with_retry() start...")
                 nonlocal attempt_number
                 try:
-                    print("fnllm/services/retryer.py Retryer.decorate().invoke().execute_with_retry() return attempt()...")
+                    print(
+                        "fnllm/services/retryer.py Retryer.decorate().invoke().execute_with_retry() return attempt()...")
                     print()
 
                     async for a in AsyncRetrying(

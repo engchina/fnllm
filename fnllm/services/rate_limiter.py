@@ -2,17 +2,22 @@
 
 """Rate limiting LLM implementation."""
 
+from __future__ import annotations
+
 from abc import abstractmethod
-from collections.abc import Awaitable, Callable
-from typing import Any, Generic
+from typing import TYPE_CHECKING, Any, Generic
 
 from typing_extensions import Unpack
 
 from fnllm.events.base import LLMEvents
 from fnllm.limiting import Limiter, Manifest
 from fnllm.types.generics import TInput, TJsonModel, TModelParameters
-from fnllm.types.io import LLMInput, LLMOutput
 from .decorator import LLMDecorator, THistoryEntry, TOutput
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
+
+    from fnllm.types.io import LLMInput, LLMOutput
 
 
 class RateLimiter(
@@ -34,7 +39,6 @@ class RateLimiter(
         self._events = events or LLMEvents()
         print("fnllm/services/rate_limiter.py RateLimiter.__init__() end...")
         print()
-
 
     @abstractmethod
     def _estimate_request_tokens(
@@ -79,25 +83,33 @@ class RateLimiter(
             print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() {manifest=}")
             try:
                 print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() {self._limiter=}")
-                print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() run `async with self._limiter.use(manifest)` start...")
+                print(
+                    f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() run `async with self._limiter.use(manifest)` start...")
                 async with self._limiter.use(manifest):
                     print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() {self._events=}")
-                    print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_acquired() start...")
+                    print(
+                        f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_acquired() start...")
                     await self._events.on_limit_acquired(manifest)
-                    print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_acquired() end...")
+                    print(
+                        f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_acquired() end...")
                     print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke delegate() start...")
                     result = await delegate(prompt, **args)
                     print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke delegate() end...")
-                print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() run `async with self._limiter.use(manifest)` end...")
+                print(
+                    f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() run `async with self._limiter.use(manifest)` end...")
             finally:
-                print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_released() start...")
+                print(
+                    f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_released() start...")
                 await self._events.on_limit_released(manifest)
-                print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_released() end...")
+                print(
+                    f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._events.on_limit_released() end...")
 
             result.metrics.estimated_input_tokens = estimated_input_tokens
-            print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._handle_post_request_limiting() start...")
+            print(
+                f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._handle_post_request_limiting() start...")
             await self._handle_post_request_limiting(result)
-            print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._handle_post_request_limiting() start...")
+            print(
+                f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() invoke self._handle_post_request_limiting() start...")
 
             print(f"fnllm/services/rate_limiter.py RateLimiter.decorate().invoke() return {result=}...")
             return result

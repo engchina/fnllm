@@ -2,22 +2,15 @@
 
 """Base LLM module."""
 
+from __future__ import annotations
+
 import traceback
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
-from typing import Generic
+from typing import TYPE_CHECKING, Generic
 
 from typing_extensions import Unpack
 
-from fnllm.caching.base import Cache
 from fnllm.events.base import LLMEvents
-from fnllm.services.decorator import LLMDecorator
-from fnllm.services.history_extractor import HistoryExtractor
-from fnllm.services.json import JsonHandler
-from fnllm.services.rate_limiter import RateLimiter
-from fnllm.services.retryer import Retryer
-from fnllm.services.usage_extractor import UsageExtractor
-from fnllm.services.variable_injector import VariableInjector
 from fnllm.types.generics import (
     THistoryEntry,
     TInput,
@@ -28,6 +21,18 @@ from fnllm.types.generics import (
 from fnllm.types.io import LLMInput, LLMOutput
 from fnllm.types.metrics import LLMUsageMetrics
 from fnllm.types.protocol import LLM
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from fnllm.caching.base import Cache
+    from fnllm.services.decorator import LLMDecorator
+    from fnllm.services.history_extractor import HistoryExtractor
+    from fnllm.services.json import JsonHandler
+    from fnllm.services.rate_limiter import RateLimiter
+    from fnllm.services.retryer import Retryer
+    from fnllm.services.usage_extractor import UsageExtractor
+    from fnllm.services.variable_injector import VariableInjector
 
 
 class BaseLLM(
@@ -76,10 +81,9 @@ class BaseLLM(
         print(f"fnllm/base/base.py BaseLLM.__init__() {self._decorated_target=}")
         print("fnllm/base/base.py BaseLLM.__init__() end...")
 
-
     def child(
             self, name: str
-    ) -> "BaseLLM[TInput, TOutput, THistoryEntry, TModelParameters]":
+    ) -> BaseLLM[TInput, TOutput, THistoryEntry, TModelParameters]:
         """Create a child LLM."""
         print("fnllm/base/base.py BaseLLM.child() start...")
         if self._cache is None:
@@ -202,9 +206,11 @@ class BaseLLM(
         await self._inject_usage(result)
         print(f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._inject_usage(result) end...")
 
-        print(f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._inject_history(result, kwargs.get('history')) start...")
+        print(
+            f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._inject_history(result, kwargs.get('history')) start...")
         self._inject_history(result, kwargs.get("history"))
-        print(f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._inject_history(result, kwargs.get('history')) end...")
+        print(
+            f"fnllm/base/base.py BaseLLM._decorator_target() invoke self._inject_history(result, kwargs.get('history')) end...")
         print(f"fnllm/base/base.py BaseLLM._decorator_target() return {result=}...")
 
         return result

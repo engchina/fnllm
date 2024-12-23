@@ -2,6 +2,8 @@
 
 """Concurrency limiter module."""
 
+from __future__ import annotations
+
 from asyncio import Semaphore
 
 from fnllm.limiting.base import Limiter, Manifest
@@ -31,7 +33,8 @@ class ConcurrencyLimiter(Limiter):
         print("fnllm/limiting/concurrency.py ConcurrencyLimiter.release() start...")
         print(f"fnllm/limiting/concurrency.py ConcurrencyLimiter.release() {manifest.request_tokens > 0=}...")
         if manifest.request_tokens > 0:
-            print("fnllm/limiting/concurrency.py ConcurrencyLimiter.release() invoke self._semaphore.release() start...")
+            print(
+                "fnllm/limiting/concurrency.py ConcurrencyLimiter.release() invoke self._semaphore.release() start...")
             self._semaphore.release()
             print("fnllm/limiting/concurrency.py ConcurrencyLimiter.release() invoke self._semaphore.release() end...")
 
@@ -39,7 +42,7 @@ class ConcurrencyLimiter(Limiter):
         print()
 
     @classmethod
-    def from_max_concurrency(cls, max_concurrency: int) -> "ConcurrencyLimiter":
+    def from_max_concurrency(cls, max_concurrency: int) -> ConcurrencyLimiter:
         """Create a new ConcurrencyLimiter."""
         print()
         print("fnllm/limiting/concurrency.py ConcurrencyLimiter.from_max_concurrency() start...")

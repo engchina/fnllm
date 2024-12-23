@@ -2,11 +2,16 @@
 
 """LLM history tracking module for OpenAI."""
 
-from collections.abc import Sequence
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from fnllm.openai.llm.utils import chat_completion_message_to_param
 from fnllm.openai.types.chat.io import OpenAIChatHistoryEntry, OpenAIChatOutput
 from fnllm.services.history_extractor import HistoryExtractor
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class OpenAIHistoryExtractor(
@@ -32,6 +37,7 @@ class OpenAIHistoryExtractor(
 
         result.append(chat_completion_message_to_param(output.raw_output))
 
-        print(f"fnllm/openai/llm/services/history_extractor.py OpenAIHistoryExtractor.extract_history() return {result=}...")
+        print(
+            f"fnllm/openai/llm/services/history_extractor.py OpenAIHistoryExtractor.extract_history() return {result=}...")
         print()
         return result

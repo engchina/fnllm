@@ -3,10 +3,16 @@
 
 """Class for LLM event usage tracking."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from fnllm.events.base import LLMEvents
-from fnllm.limiting.base import Manifest
 from fnllm.types.metrics import LLMUsageMetrics
 from fnllm.utils.sliding_window import SlidingWindow
+
+if TYPE_CHECKING:
+    from fnllm.limiting.base import Manifest
 
 
 class LLMUsageTracker(LLMEvents):
@@ -104,7 +110,7 @@ class LLMUsageTracker(LLMEvents):
         print()
 
     @classmethod
-    def create(cls) -> "LLMUsageTracker":
+    def create(cls) -> LLMUsageTracker:
         """Create a new LLMUsageTracker with proper sliding windows."""
         print()
         print("fnllm/events/usage_tracker.py LLMUsageTracker.create() start...")

@@ -2,13 +2,18 @@
 
 """Class for LLM composite event handling."""
 
+from __future__ import annotations
+
 import asyncio
-from collections.abc import Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from fnllm.events.base import LLMEvents
-from fnllm.limiting.base import Manifest
-from fnllm.types.metrics import LLMMetrics, LLMUsageMetrics
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from fnllm.limiting.base import Manifest
+    from fnllm.types.metrics import LLMMetrics, LLMUsageMetrics
 
 
 class LLMCompositeEvents(LLMEvents):
@@ -24,10 +29,12 @@ class LLMCompositeEvents(LLMEvents):
         """Hook called before the actual LLM call."""
         print()
         print("fnllm/events/composite.py LLMCompositeEvents.on_execute_llm() start...")
-        print(f"fnllm/events/composite.py LLMCompositeEvents.on_execute_llm() invoke `handler.on_execute_llm() for handler in self._handlers` start...")
+        print(
+            f"fnllm/events/composite.py LLMCompositeEvents.on_execute_llm() invoke `handler.on_execute_llm() for handler in self._handlers` start...")
         print(f"fnllm/events/composite.py LLMCompositeEvents.on_execute_llm() {self._handlers=}")
         await asyncio.gather(*[handler.on_execute_llm() for handler in self._handlers])
-        print(f"fnllm/events/composite.py LLMCompositeEvents.on_execute_llm() invoke `handler.on_execute_llm() for handler in self._handlers` end...")
+        print(
+            f"fnllm/events/composite.py LLMCompositeEvents.on_execute_llm() invoke `handler.on_execute_llm() for handler in self._handlers` end...")
         print("fnllm/events/composite.py LLMCompositeEvents.on_execute_llm() end...")
         print()
 
@@ -39,13 +46,15 @@ class LLMCompositeEvents(LLMEvents):
     ) -> None:
         """An unhandled error that happens during the LLM call (called by the LLM base)."""
         print("fnllm/events/composite.py LLMCompositeEvents.on_error() start...")
-        print(f"fnllm/events/composite.py LLMCompositeEvents.on_error() invoke `handler.on_error(error, traceback, arguments) for handler in self._handlers` start...")
+        print(
+            f"fnllm/events/composite.py LLMCompositeEvents.on_error() invoke `handler.on_error(error, traceback, arguments) for handler in self._handlers` start...")
         print(f"fnllm/events/composite.py LLMCompositeEvents.on_error() {self._handlers=}")
         print(f"fnllm/events/composite.py LLMCompositeEvents.on_error() {error=}")
         await asyncio.gather(*[
             handler.on_error(error, traceback, arguments) for handler in self._handlers
         ])
-        print(f"fnllm/events/composite.py LLMCompositeEvents.on_error() invoke `handler.on_error(error, traceback, arguments) for handler in self._handlers` end...")
+        print(
+            f"fnllm/events/composite.py LLMCompositeEvents.on_error() invoke `handler.on_error(error, traceback, arguments) for handler in self._handlers` end...")
         print(f"fnllm/events/composite.py LLMCompositeEvents.on_error() end...")
         print()
 
@@ -53,11 +62,13 @@ class LLMCompositeEvents(LLMEvents):
         """Called when there is any LLM usage."""
         print()
         print("fnllm/events/composite.py LLMCompositeEvents.on_usage() start...")
-        print(f"fnllm/events/composite.py LLMCompositeEvents.on_usage() invoke `handler.on_usage(usage) for handler in self._handlers` start...")
+        print(
+            f"fnllm/events/composite.py LLMCompositeEvents.on_usage() invoke `handler.on_usage(usage) for handler in self._handlers` start...")
         print(f"fnllm/events/composite.py LLMCompositeEvents.on_usage() {self._handlers=}")
         print(f"fnllm/events/composite.py LLMCompositeEvents.on_usage() {usage=}")
         await asyncio.gather(*[handler.on_usage(usage) for handler in self._handlers])
-        print(f"fnllm/events/composite.py LLMCompositeEvents.on_usage() invoke `handler.on_usage(usage) for handler in self._handlers` end...")
+        print(
+            f"fnllm/events/composite.py LLMCompositeEvents.on_usage() invoke `handler.on_usage(usage) for handler in self._handlers` end...")
         print(f"fnllm/events/composite.py LLMCompositeEvents.on_usage() end...")
         print()
 
@@ -65,13 +76,15 @@ class LLMCompositeEvents(LLMEvents):
         """Called when limit is acquired for a request (does not include post limiting)."""
         print()
         print("fnllm/events/composite.py LLMCompositeEvents.on_limit_acquired() start...")
-        print(f"fnllm/events/composite.py LLMCompositeEvents.on_limit_acquired() invoke `handler.on_limit_acquired(manifest) for handler in self._handlers` start...")
+        print(
+            f"fnllm/events/composite.py LLMCompositeEvents.on_limit_acquired() invoke `handler.on_limit_acquired(manifest) for handler in self._handlers` start...")
         print(f"fnllm/events/composite.py LLMCompositeEvents.on_limit_acquired() {self._handlers=}")
         print(f"fnllm/events/composite.py LLMCompositeEvents.on_limit_acquired() {manifest=}")
         await asyncio.gather(*[
             handler.on_limit_acquired(manifest) for handler in self._handlers
         ])
-        print(f"fnllm/events/composite.py LLMCompositeEvents.on_limit_acquired() invoke `handler.on_limit_acquired(manifest) for handler in self._handlers` end...")
+        print(
+            f"fnllm/events/composite.py LLMCompositeEvents.on_limit_acquired() invoke `handler.on_limit_acquired(manifest) for handler in self._handlers` end...")
 
         print("fnllm/events/composite.py LLMCompositeEvents.on_limit_acquired() end...")
         print()
@@ -80,16 +93,17 @@ class LLMCompositeEvents(LLMEvents):
         """Called when limit is released for a request (does not include post limiting)."""
         print()
         print("fnllm/events/composite.py LLMCompositeEvents.on_limit_released() start...")
-        print(f"fnllm/events/composite.py LLMCompositeEvents.on_limit_released() invoke `handler.on_limit_released(manifest) for handler in self._handlers` start...")
+        print(
+            f"fnllm/events/composite.py LLMCompositeEvents.on_limit_released() invoke `handler.on_limit_released(manifest) for handler in self._handlers` start...")
         print(f"fnllm/events/composite.py LLMCompositeEvents.on_limit_released() {self._handlers=}")
         print(f"fnllm/events/composite.py LLMCompositeEvents.on_limit_released() {manifest}")
         await asyncio.gather(*[
             handler.on_limit_released(manifest) for handler in self._handlers
         ])
-        print(f"fnllm/events/composite.py LLMCompositeEvents.on_limit_released() invoke `handler.on_limit_released(manifest) for handler in self._handlers` end...")
+        print(
+            f"fnllm/events/composite.py LLMCompositeEvents.on_limit_released() invoke `handler.on_limit_released(manifest) for handler in self._handlers` end...")
         print("fnllm/events/composite.py LLMCompositeEvents.on_limit_released() end...")
         print()
-
 
     async def on_post_limit(self, manifest: Manifest) -> None:
         """Called when post request limiting is triggered (called by the rate limiting LLM)."""
@@ -103,7 +117,8 @@ class LLMCompositeEvents(LLMEvents):
         await asyncio.gather(*[
             handler.on_post_limit(manifest) for handler in self._handlers
         ])
-        print(f"fnllm/events/composite.py LLMCompositeEvents.on_post_limit() invoke `handler.on_post_limit(manifest) for handler in self._handlers` end...")
+        print(
+            f"fnllm/events/composite.py LLMCompositeEvents.on_post_limit() invoke `handler.on_post_limit(manifest) for handler in self._handlers` end...")
         print("fnllm/events/composite.py LLMCompositeEvents.on_post_limit() end...")
         print()
 
@@ -125,7 +140,6 @@ class LLMCompositeEvents(LLMEvents):
             f"fnllm/events/composite.py LLMCompositeEvents.on_success() invoke `handler.on_success(metrics) for handler in self._handlers` end...")
         print("fnllm/events/composite.py LLMCompositeEvents.on_success() end...")
         print()
-
 
     async def on_cache_hit(self, cache_key: str, name: str | None) -> None:
         """Called when there is a cache hit."""

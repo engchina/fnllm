@@ -82,7 +82,6 @@ class OCIGenAIParseToolsLLM(
             # ) from err
             raise err
 
-
     def _parse_tool_calls(
             self,
             raw_output: OCIGenAIChatCompletionMessageModel,

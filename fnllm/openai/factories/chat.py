@@ -89,7 +89,7 @@ def _create_openai_text_chat_llm(
     print(f"fnllm/openai/factories/chat.py _create_openai_text_chat_llm() {events=}")
     operation = "chat"
     print("fnllm/openai/factories/chat.py _create_openai_text_chat_llm() invoke create_json_handler() start...")
-    json_handler=create_json_handler(config.json_strategy, config.max_json_retries)
+    json_handler = create_json_handler(config.json_strategy, config.max_json_retries)
     print("fnllm/openai/factories/chat.py _create_openai_text_chat_llm() invoke create_json_handler() end...")
 
     print("fnllm/openai/factories/chat.py _create_openai_text_chat_llm() invoke create_retryer() start...")
@@ -139,7 +139,8 @@ def _create_openai_streaming_chat_llm(
     rate_limiter = create_rate_limiter(limiter=limiter, config=config, events=events)
     print(f"fnllm/openai/factories/chat.py _create_openai_streaming_chat_llm() {rate_limiter=}")
 
-    print("fnllm/openai/factories/chat.py _create_openai_streaming_chat_llm() return OpenAIStreamingChatLLMImpl() start...")
+    print(
+        "fnllm/openai/factories/chat.py _create_openai_streaming_chat_llm() return OpenAIStreamingChatLLMImpl() start...")
     print()
     return OpenAIStreamingChatLLMImpl(
         client,

@@ -2,20 +2,27 @@
 
 """Tool handling error definitions."""
 
-from pydantic import ValidationError
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pydantic import ValidationError
 
 # from fnllm.oci_genai.types import (
 #     OCIGenAIChatCompletionMessageModel,
 #     OCIGenAIChatCompletionMessageToolCallModel,
 # )
+
 from fnllm.openai.types.aliases import (
     OpenAIChatCompletionMessageModel,
     OpenAIChatCompletionMessageToolCallModel,
 )
+
 from .base import LLMTool
 
 
-class OpenAIToolInvalidArgumentsError(RuntimeError):
+class ToolInvalidArgumentsError(RuntimeError):
     """Raise when a tool is called with invalid arguments."""
 
     def __init__(
@@ -37,7 +44,7 @@ class OpenAIToolInvalidArgumentsError(RuntimeError):
         )
 
 
-class OpenAIToolNotFoundError(RuntimeError):
+class ToolNotFoundError(RuntimeError):
     """LLM tried to call a tool that was not found."""
 
     def __init__(

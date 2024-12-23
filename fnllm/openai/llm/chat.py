@@ -1,24 +1,28 @@
 # Copyright (c) 2024 Microsoft Corporation.
 """OpenAI Chat LLM."""
 
-from typing import Any, Literal, overload
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 from typing_extensions import Unpack
 
-from fnllm.openai.types.chat.io import (
-    OpenAIChatCompletionInput,
-    OpenAIChatHistoryEntry,
-    OpenAIChatOutput,
-    OpenAIStreamingChatOutput,
-)
-from fnllm.openai.types.chat.parameters import OpenAIChatParameters
 from fnllm.openai.types.client import (
     OpenAIChatLLM,
     OpenAIStreamingChatLLM,
     OpenAITextChatLLM,
 )
-from fnllm.types.generics import TJsonModel
-from fnllm.types.io import LLMInput, LLMOutput
+
+if TYPE_CHECKING:
+    from fnllm.openai.types.chat.io import (
+        OpenAIChatCompletionInput,
+        OpenAIChatHistoryEntry,
+        OpenAIChatOutput,
+        OpenAIStreamingChatOutput,
+    )
+    from fnllm.openai.types.chat.parameters import OpenAIChatParameters
+    from fnllm.types.generics import TJsonModel
+    from fnllm.types.io import LLMInput, LLMOutput
 
 
 class OpenAIChatLLMImpl(OpenAIChatLLM):
@@ -38,7 +42,7 @@ class OpenAIChatLLMImpl(OpenAIChatLLM):
         print("fnllm/openai/llm/chat.py OpenAIChatLLMImpl.__init__() end...")
         print()
 
-    def child(self, name: str) -> "OpenAIChatLLMImpl":
+    def child(self, name: str) -> OpenAIChatLLMImpl:
         """Create a child LLM (with child cache)."""
         print()
         print("fnllm/openai/llm/chat.py OpenAIChatLLMImpl.child() start...")
@@ -91,7 +95,8 @@ class OpenAIChatLLMImpl(OpenAIChatLLM):
         print("fnllm/openai/llm/chat.py OpenAIChatLLMImpl.__call__() start...")
         print(f"fnllm/openai/llm/chat.py OpenAIChatLLMImpl.__call__() {stream=}")
         if stream:
-            print(f"fnllm/openai/llm/chat.py OpenAIChatLLMImpl.__call__() return self._streaming_chat_llm(prompt, **kwargs)")
+            print(
+                f"fnllm/openai/llm/chat.py OpenAIChatLLMImpl.__call__() return self._streaming_chat_llm(prompt, **kwargs)")
             print()
             return await self._streaming_chat_llm(prompt, **kwargs)
 

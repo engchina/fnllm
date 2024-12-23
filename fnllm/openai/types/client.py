@@ -2,7 +2,16 @@
 
 """OpenAI client types."""
 
-from typing import Literal, Protocol, TypeAlias, overload, runtime_checkable
+from __future__ import annotations
+
+from typing import (
+    TYPE_CHECKING,
+    Literal,
+    Protocol,
+    TypeAlias,
+    overload,
+    runtime_checkable,
+)
 
 # from openai import AsyncAzureOpenAI, AsyncOpenAI
 from langfuse.openai import AsyncAzureOpenAI, AsyncOpenAI
@@ -20,9 +29,11 @@ from fnllm.openai.types.embeddings.io import (
     OpenAIEmbeddingsOutput,
 )
 from fnllm.openai.types.embeddings.parameters import OpenAIEmbeddingsParameters
-from fnllm.types.generics import TJsonModel
-from fnllm.types.io import LLMInput, LLMOutput
 from fnllm.types.protocol import LLM
+
+if TYPE_CHECKING:
+    from fnllm.types.generics import TJsonModel
+    from fnllm.types.io import LLMInput, LLMOutput
 
 OpenAIClient = AsyncOpenAI | AsyncAzureOpenAI
 """Allowed OpenAI client types."""
@@ -43,10 +54,7 @@ OpenAIStreamingChatLLM: TypeAlias = LLM[
 ]
 
 OpenAIEmbeddingsLLM: TypeAlias = LLM[
-    OpenAIEmbeddingsInput,
-    OpenAIEmbeddingsOutput,
-    None,
-    OpenAIEmbeddingsParameters
+    OpenAIEmbeddingsInput, OpenAIEmbeddingsOutput, None, OpenAIEmbeddingsParameters
 ]
 """Alias for the fully typed OpenAIEmbeddingsLLM instance."""
 
@@ -77,6 +85,6 @@ class OpenAIChatLLM(Protocol):
             ],
     ) -> LLMOutput[OpenAIChatOutput, TJsonModel, OpenAIChatHistoryEntry]: ...
 
-    def child(self, name: str) -> "OpenAIChatLLM":
+    def child(self, name: str) -> OpenAIChatLLM:
         """Create a child LLM."""
         ...

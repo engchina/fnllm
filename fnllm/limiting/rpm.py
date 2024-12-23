@@ -1,6 +1,9 @@
 # Copyright (c) 2024 Microsoft Corporation.
 
 """TPM RPM limiter module."""
+
+from __future__ import annotations
+
 from datetime import datetime
 
 from aiolimiter import AsyncLimiter
@@ -54,9 +57,7 @@ class RPMLimiter(Limiter):
         print()
 
     @classmethod
-    def from_rpm(
-            cls, requests_per_minute: int, burst_mode: bool = True
-    ) -> "RPMLimiter":
+    def from_rpm(cls, requests_per_minute: int, burst_mode: bool = True) -> RPMLimiter:
         """Create a new RPMLimiter."""
         print()
         print("fnllm/limiting/rpm.py RPMLimiter.from_rpm() start...")

@@ -2,16 +2,14 @@
 
 """LLM tools parsing module for OpenAI."""
 
-from collections.abc import Sequence
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import pydantic
 from typing_extensions import Unpack
 
 from fnllm.openai.llm.utils import llm_tools_to_param
-from fnllm.openai.types.aliases import (
-    OpenAIChatCompletionMessageModel,
-    OpenAIChatCompletionMessageToolCallModel,
-)
 from fnllm.openai.types.chat.io import (
     OpenAIChatCompletionInput,
     OpenAIChatHistoryEntry,
@@ -19,10 +17,18 @@ from fnllm.openai.types.chat.io import (
 )
 from fnllm.openai.types.chat.parameters import OpenAIChatParameters
 from fnllm.tools import LLMTool
-from fnllm.tools.errors import OpenAIToolInvalidArgumentsError, OpenAIToolNotFoundError
-from fnllm.types.generics import TJsonModel
-from fnllm.types.io import LLMInput, LLMOutput
+from fnllm.tools.errors import ToolInvalidArgumentsError
 from fnllm.types.protocol import LLM
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from fnllm.openai.types.aliases import (
+        OpenAIChatCompletionMessageModel,
+        OpenAIChatCompletionMessageToolCallModel,
+    )
+    from fnllm.types.generics import TJsonModel
+    from fnllm.types.io import LLMInput, LLMOutput
 
 
 class OpenAIParseToolsLLM(
@@ -78,10 +84,11 @@ class OpenAIParseToolsLLM(
         print("fnllm/openai/llm/features/tools_parsing.py _parse_arguments.__init__() start...")
         try:
             print("fnllm/openai/llm/features/tools_parsing.py _parse_arguments.__init__() end...")
-            print("fnllm/openai/llm/features/tools_parsing.py _parse_arguments.__init__() return json_model.model_validate_json()...")
+            print(
+                "fnllm/openai/llm/features/tools_parsing.py _parse_arguments.__init__() return json_model.model_validate_json()...")
             return json_model.model_validate_json(tool_call.function.arguments)
         except pydantic.ValidationError as err:
-            raise OpenAIToolInvalidArgumentsError(
+            raise ToolInvalidArgumentsError(
                 raw_output,
                 tool_call=tool_call,
                 expected_tool=json_model,

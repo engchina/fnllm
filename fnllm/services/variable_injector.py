@@ -2,10 +2,13 @@
 
 """Generic LLM variables replacing module."""
 
-from string import Template
-from typing import TypeVar, cast
+from __future__ import annotations
 
-from fnllm.types import PromptVariables
+from string import Template
+from typing import TYPE_CHECKING, TypeVar, cast
+
+if TYPE_CHECKING:
+    from fnllm.types import PromptVariables
 
 TInput = TypeVar("TInput")
 
@@ -25,5 +28,6 @@ class VariableInjector:
         if isinstance(parsed_prompt, str) and variables:
             parsed_prompt = Template(parsed_prompt).substitute(**variables)
 
-        print("fnllm/services/variable_injector.py VariableInjector.inject_variables() return cast(TInput, parsed_prompt)...")
+        print(
+            "fnllm/services/variable_injector.py VariableInjector.inject_variables() return cast(TInput, parsed_prompt)...")
         return cast(TInput, parsed_prompt)
