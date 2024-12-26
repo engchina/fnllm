@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
+from langfuse.decorators import observe, langfuse_context
 from typing_extensions import Unpack
 
 from fnllm.base.base import BaseLLM
@@ -101,6 +102,29 @@ class OpenAIEmbeddingsLLMImpl(
 
         return params
 
+    @observe(as_type="generation", name="OpenAI-embeddings")
+    async def _base_create_embeddings(self, prompt, parameters):
+        print("fnllm/openai/llm/embeddings.py OpenAIEmbeddingsLLMImpl._base_create_embeddings() start...")
+        print(f"fnllm/openai/llm/embeddings.py OpenAIEmbeddingsLLMImpl._base_create_embeddings() {parameters=}")
+        parameters_clone = parameters.copy()
+        model = parameters_clone.pop('model', None)
+
+        res = await self._client.embeddings.create(
+            input=prompt,
+            **parameters,
+        )
+        langfuse_context.update_current_observation(
+            input=input,
+            model=model,
+            metadata=parameters_clone,
+            usage_details={
+                "input": res.usage.prompt_tokens,
+                "output": res.usage.total_tokens - res.usage.prompt_tokens,
+                "total": res.usage.total_tokens,
+            }
+        )
+        return res
+
     async def _call_embeddings_or_cache(
             self,
             name: str | None,
@@ -111,10 +135,11 @@ class OpenAIEmbeddingsLLMImpl(
     ) -> Cached[OpenAICreateEmbeddingResponseModel]:
         # TODO: check if we need to remove max_tokens and n from the keys
         return await self._cache.get_or_insert(
-            lambda: self._client.embeddings.create(
-                input=prompt,
-                **parameters,
-            ),
+            # lambda: self._client.embeddings.create(
+            #     input=prompt,
+            #     **parameters,
+            # ),
+            lambda: self._base_create_embeddings(prompt, parameters),
             prefix=f"embeddings_{name}" if name else "embeddings",
             key_data={"input": prompt, "parameters": parameters},
             name=name,

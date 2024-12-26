@@ -1,12 +1,14 @@
 import os
 
 import gradio as gr
+import numpy as np
 # import numpy as np
 from dotenv import load_dotenv, find_dotenv
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 # from fnllm.oci_genai import PublicOCIGenAIConfig, create_oci_genai_client, create_oci_genai_chat_llm, \
 #     create_oci_genai_embeddings_llm
-from fnllm.openai import create_openai_client, create_openai_chat_llm, PublicOpenAIConfig
+from fnllm.openai import create_openai_client, create_openai_chat_llm, PublicOpenAIConfig, create_openai_embeddings_llm
 
 # read local .env file
 load_dotenv(find_dotenv())
@@ -61,6 +63,7 @@ html, body, *:not(code):not(pre) {
 """
 
 
+
 async def openai_chat(message, history):
     print("main.py openai_chat() start...")
     print(f"main.py openai_chat() {message=}")
@@ -103,6 +106,30 @@ async def openai_chat(message, history):
     # print(f"{response=}")
     # yield response.history[-1]
 
+    # llm = ChatOpenAI(
+    #     api_key=os.environ['OPENAI_API_KEY'],
+    #     base_url=os.environ['OPENAI_BASE_URL'],
+    #     model="gpt-4",
+    #     temperature=0,
+    #     max_tokens=None,
+    #     timeout=None,
+    #     max_retries=2,
+    #     # api_key="...",  # if you prefer to pass api key in directly instaed of using env vars
+    #     # base_url="...",
+    #     # organization="...",
+    #     # other params...
+    # )
+    #
+    # messages = [
+    #     (
+    #         "system",
+    #         "You are a helpful assistant that translates English to French. Translate the user sentence.",
+    #     ),
+    #     ("human", "I love programming."),
+    # ]
+    # ai_msg = llm.invoke(messages)
+    # print(ai_msg)
+
     print("main.py openai_chat() invoke openai_chat_llm() start...")
     response = await openai_chat_llm(
         prompt=message,
@@ -119,6 +146,57 @@ async def openai_chat(message, history):
             answer += chunk
             yield answer
 
+
+
+async def openai_embedding(message, history):
+    print(f"{message=}")
+    print("create configuration start...")
+    configuration = PublicOpenAIConfig(
+        api_key=os.environ['OPENAI_API_KEY'],
+        base_url=os.environ['OPENAI_EMBED_BASE_URL'],
+        model=os.environ['OPENAI_EMBED_MODEL'],
+        tokens_per_minute=0,
+        requests_per_minute=1,
+        requests_burst_mode=False,
+    )
+    print(f"{configuration=}")
+    print("create configuration end...")
+
+    print("create client start...")
+    client = create_openai_client(configuration)
+    print(f"{client=}")
+    print("create client end...")
+
+    print("create openai_embeddings_llm start...")
+    openai_embeddings_llm = create_openai_embeddings_llm(
+        configuration,
+        client=client,
+    )
+    print(f"{openai_embeddings_llm=}")
+    print("create openai_embeddings_llm end...")
+
+    # embeddings = OpenAIEmbeddings(
+    #     api_key=os.environ['OPENAI_API_KEY'],
+    #     base_url=os.environ['OPENAI_EMBED_BASE_URL'],
+    #     model=os.environ['OPENAI_EMBED_MODEL'],
+    #     # With the `text-embedding-3` class
+    #     # of models, you can specify the size
+    #     # of the embeddings you want returned.
+    #     # dimensions=1024
+    # )
+    # text = "LangChain is the framework for building context-aware reasoning applications"
+    # single_vector = embeddings.embed_query(text)
+    # print(str(single_vector)[:10])  # Show the first 100 characters of the vector
+
+    print("create response start...")
+    response = await openai_embeddings_llm(
+        prompt=[message],
+        name="embedding",
+    )
+    # print(f"{response=}")
+    # print(f"{response.output=}")
+    # print(f"{response.output.embeddings=}")
+    yield {"role": "assistant", "content": str(np.array(response.output.embeddings[0]).tolist())}
 
 # async def oci_genai_embedding(message, history):
 #     print(f"{message=}")
@@ -296,6 +374,26 @@ with gr.Blocks(css=custom_css) as app:
                 fn=openai_chat,
                 type="messages",
                 chatbot=openai_chatbot
+            )
+        with gr.Column():
+            openai_embed_chatbot = gr.Chatbot(
+                label="OpenAI",
+                type="messages",
+                placeholder="<strong>Your Personal AI Teacher</strong><br>Ask Me Anything",
+                height=720,
+                min_height=720,
+                max_height=720,
+                show_copy_button=True,
+            )
+            openai_embed_chatbot.like(
+                vote,
+                [],
+                [vote_output]
+            )
+            gr.ChatInterface(
+                fn=openai_embedding,
+                type="messages",
+                chatbot=openai_embed_chatbot
             )
         # with gr.Column(visible=False):
         #     oci_genai_chatbot = gr.Chatbot(
