@@ -114,7 +114,6 @@ class OpenAIEmbeddingsLLMImpl(
             **parameters,
         )
         langfuse_context.update_current_observation(
-            input=input,
             model=model,
             metadata=parameters_clone,
             usage_details={
